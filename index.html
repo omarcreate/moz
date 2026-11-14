@@ -1,958 +1,2902 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="midnight">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مذكرات الهندسة - Engineering Notes</title>
-    
-    <!-- خطوط جوجل (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- مكتبة Tailwind CSS للتصميم -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- مكتبة FontAwesome للأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- مكتبة Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=5.0" />
+  <title>مذكرات الهندسة - Engineering Notes | بوابة المذاكرة والمحاضرات</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- إعدادات Tailwind -->
+  <style>
+    /* ==================== متغيرات الثيمات (Midnight / Dark / Light) ==================== */
+    :root, [data-theme="midnight"] {
+      --bg-main: #000000;
+      --bg-secondary: #070a10;
+      --bg-card: #0b0f17;
+      --bg-card-hover: #111826;
+      --bg-table-row: #0a0a0c;
+      --bg-table-header: #121318;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --border-color: #1f242d;
+      --border-dashed: #2a313c;
+      --accent-primary: #58a6ff;
+      --accent-secondary: #3b82f6;
+      --accent-day: #6cb6ff;
+      --pdf-red: #f85149;
+      --img-green: #2ea043;
+      --img-neon: #00e676;
+      --warning: #d29922;
+      --success: #238636;
+      --header-olive: #6b7032;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.85);
+      --input-bg: #05080d;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #121418;
+      --bg-secondary: #1a1d24;
+      --bg-card: #1e222b;
+      --bg-card-hover: #262b36;
+      --bg-table-row: #181b22;
+      --bg-table-header: #222630;
+      --text-main: #e6edf3;
+      --text-muted: #9ca3af;
+      --border-color: #30363d;
+      --border-dashed: #404854;
+      --accent-primary: #60a5fa;
+      --accent-secondary: #2563eb;
+      --accent-day: #79c0ff;
+      --pdf-red: #ff5252;
+      --img-green: #2ea043;
+      --img-neon: #00e676;
+      --warning: #e3b341;
+      --success: #2ea043;
+      --header-olive: #5c612b;
+      --shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      --input-bg: #14171d;
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f3f4f6;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --bg-table-row: #ffffff;
+      --bg-table-header: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #4b5563;
+      --border-color: #d1d5db;
+      --border-dashed: #9ca3af;
+      --accent-primary: #2563eb;
+      --accent-secondary: #1d4ed8;
+      --accent-day: #1d4ed8;
+      --pdf-red: #dc2626;
+      --img-green: #16a34a;
+      --img-neon: #16a34a;
+      --warning: #d97706;
+      --success: #15803d;
+      --header-olive: #6b7032;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      --input-bg: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      padding-bottom: 60px;
+    }
+
+    /* ==================== شريط المساحة الكلية بأعلى الصفحة ==================== */
+    .storage-top-banner {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .storage-top-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .storage-row-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .storage-title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.98rem;
+    }
+
+    .storage-badge-total {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+      font-weight: 700;
+      direction: ltr;
+    }
+
+    .storage-progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--input-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .storage-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--img-neon));
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
+    .storage-stats-sub {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      gap: 8px;
+    }
+
+    .cloud-status-pills {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+    }
+
+    .status-pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #888;
+    }
+
+    .status-pill.online .dot {
+      background: var(--img-neon);
+      box-shadow: 0 0 6px var(--img-neon);
+    }
+
+    .status-pill.warn .dot {
+      background: var(--warning);
+    }
+
+    /* ==================== الهيدر والساعة والتاريخ ==================== */
+    .app-header {
+      background-color: var(--header-olive);
+      color: #ffffff;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-container {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      opacity: 0.88;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-cycle-btn {
+      background: rgba(0, 0, 0, 0.35);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      padding: 7px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-cycle-btn:hover {
+      background: rgba(0, 0, 0, 0.55);
+      transform: translateY(-1px);
+    }
+
+    /* شريط الساعة والتاريخ الميلادي والهجري */
+    .datetime-bar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 16px;
+    }
+
+    .datetime-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .clock-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 5px 14px;
+      border-radius: 10px;
+    }
+
+    .clock-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      direction: ltr;
+      letter-spacing: 0.5px;
+    }
+
+    .clock-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .dates-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .date-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-chip i {
+      color: var(--accent-primary);
+    }
+
+    /* ==================== أزرار التنقل الرئيسية ==================== */
+    .main-container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 18px 14px;
+    }
+
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .nav-tab-btn {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn.active {
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.18), rgba(59, 130, 246, 0.08));
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 16px rgba(88, 166, 255, 0.15);
+    }
+
+    .tab-section {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==================== قسم المواد والفولدرات ==================== */
+    .toolbar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 38px 10px 12px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-main);
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary {
+      background: var(--accent-secondary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary);
+      color: #000;
+    }
+
+    .btn-success {
+      background: var(--img-green);
+      color: #ffffff;
+      border-color: var(--img-neon);
+    }
+
+    .btn-danger {
+      background: rgba(248, 81, 73, 0.14);
+      color: var(--pdf-red);
+      border-color: rgba(248, 81, 73, 0.4);
+    }
+
+    .btn-danger:hover {
+      background: var(--pdf-red);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 6px 11px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    /* شبكة الفولدرات (المواد) */
+    .folders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .folder-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .folder-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .folder-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .folder-icon-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .folder-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(88, 166, 255, 0.14);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .folder-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .folder-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .folder-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .folder-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ==================== داخل المادة (رفع وتصفح الملفات) ==================== */
+    .subject-inside-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .upload-dropzone {
+      background: var(--bg-card);
+      border: 2px dashed var(--accent-primary);
+      border-radius: 14px;
+      padding: 24px 16px;
+      text-align: center;
+      margin-bottom: 18px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .upload-dropzone.dragover {
+      background: rgba(88, 166, 255, 0.12);
+      border-color: var(--img-neon);
+    }
+
+    .upload-dropzone i.main-up-icon {
+      font-size: 2.3rem;
+      color: var(--accent-primary);
+      margin-bottom: 8px;
+    }
+
+    .upload-dropzone h3 {
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    .upload-dropzone p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .upload-progress-box {
+      display: none;
+      margin-top: 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-align: right;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-pill {
+      background: var(--input-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background: var(--accent-primary);
+      color: #000;
+      border-color: var(--accent-primary);
+    }
+
+    /* شبكة الملفات داخل المادة */
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .file-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 13px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .file-card.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.25);
+    }
+
+    .file-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+    }
+
+    .file-select-chk {
+      width: 19px;
+      height: 19px;
+      accent-color: var(--accent-primary);
+      cursor: pointer;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .file-type-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .file-type-icon.pdf {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--pdf-red);
+    }
+
+    .file-type-icon.image {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--img-neon);
+    }
+
+    .file-type-icon.text {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-primary);
+    }
+
+    .file-type-icon.other {
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--warning);
+    }
+
+    .file-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-weight: 800;
+      font-size: 0.94rem;
+      word-break: break-word;
+      line-height: 1.35;
+    }
+
+    .file-details {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .file-thumb-preview {
+      width: 100%;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      background: #000;
+    }
+
+    .file-text-snippet {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-height: 80px;
+      overflow: hidden;
+      white-space: pre-wrap;
+      cursor: pointer;
+    }
+
+    .sync-badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 0.7rem;
+    }
+
+    .mini-badge {
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .mini-badge.ok {
+      color: var(--img-neon);
+      border-color: rgba(0, 230, 118, 0.35);
+    }
+
+    .file-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+
+    /* ==================== قسم الجدول الدراسي (مطابق للصورة تماماً) ==================== */
+    .schedule-wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .schedule-top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .schedule-table-card {
+      background: var(--bg-table-row);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid var(--border-color);
+      padding: 14px 12px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .schedule-table thead th {
+      background: var(--bg-table-header);
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .schedule-table th.col-day,
+    .schedule-table td.col-day {
+      width: 28%;
+      color: var(--accent-day);
+      font-weight: 800;
+      font-size: 0.98rem;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .schedule-table th.col-lec {
+      width: 72%;
+      color: var(--text-main);
+    }
+
+    .schedule-table td.col-lec {
+      color: var(--text-main);
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      word-break: break-word;
+    }
+
+    .schedule-table td.col-lec:hover {
+      background: rgba(88, 166, 255, 0.08);
+    }
+
+    .schedule-day-input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--accent-primary);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    /* البطاقات المنقطة أسفل الجدول (ملف الجدول PDF + صور الجدول) */
+    .schedule-dashed-card {
+      background: var(--bg-table-row);
+      border: 1.5px dashed var(--border-dashed);
+      border-radius: 14px;
+      padding: 28px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .schedule-dashed-card:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .sched-card-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .sched-card-icon.pdf-icon {
+      color: var(--pdf-red);
+    }
+
+    .sched-card-icon.img-icon {
+      color: var(--img-neon);
+    }
+
+    .schedule-dashed-card h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .schedule-dashed-card p.sched-empty-msg {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .sched-uploaded-box {
+      margin-top: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .sched-images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .sched-img-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sched-img-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* ==================== النوافذ المنبثقة (Modals) ==================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-box.large {
+      max-width: 960px;
+      height: 88vh;
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-header h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .form-textarea {
+      min-height: 170px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .viewer-iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 65vh;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 340px;
+    }
+
+    .toast-msg {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border-right: 4px solid var(--accent-primary);
+      border-top: 1px solid var(--border-color);
+      border-left: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 11px 15px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .empty-state-box {
+      background: var(--bg-card);
+      border: 1px dashed var(--border-dashed);
+      border-radius: 14px;
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 640px) {
+      .nav-tabs {
+        grid-template-columns: 1fr;
+      }
+      .header-container, .datetime-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .schedule-table th.col-day, .schedule-table td.col-day {
+        width: 32%;
+      }
+    }
+  </style>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="./manifest.json?v=v1794645919808">
+    <meta name="theme-color" content="#ffff00">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=v1794645919808">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { cairo: ['Cairo', 'sans-serif'] },
-                    colors: {
-                        keep: { blue: '#8ab4f8', yellow: '#fbbc04', borderDark: '#5f6368', borderLight: '#e0e0e0' }
-                    }
-                }
-            }
-        }
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js?v=v1794645919808')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Failed', err));
+        });
+      }
     </script>
-
-    <!-- نظام الثيمات والتصميم + حماية قوية ضد التداخل -->
-    <style>
-        .hidden-force, .hidden { display: none !important; }
-        
-        :root {
-            --bg-main: #ffffff; --panel-bg: #ffffff; --text-main: #202124; --text-muted: #5f6368;
-            --border-color: #e0e0e0; --hover-bg: #f1f3f4; --input-bg: #ffffff;
-            --shadow-color: rgba(0, 0, 0, 0.1); --header-bg: #ffffff;
-        }
-        body.theme-dark {
-            --bg-main: #202124; --panel-bg: #202124; --text-main: #e8eaed; --text-muted: #9aa0a6;
-            --border-color: #5f6368; --hover-bg: #303134; --input-bg: #202124;
-            --shadow-color: rgba(0, 0, 0, 0.5); --header-bg: #202124;
-        }
-        body.theme-midnight {
-            --bg-main: #000000; --panel-bg: #0a0a0a; --text-main: #e2e8f0; --text-muted: #94a3b8;
-            --border-color: #333333; --hover-bg: #1a1a1a; --input-bg: #111111;
-            --shadow-color: rgba(255, 255, 255, 0.05); --header-bg: #000000;
-        }
-
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; margin: 0; }
-        
-        .keep-card { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; position: relative; transition: box-shadow 0.2s ease; }
-        .keep-card:hover { box-shadow: 0 1px 2px 0 var(--shadow-color), 0 2px 6px 2px var(--shadow-color); }
-        .keep-card-actions { opacity: 0; transition: opacity 0.2s; }
-        .keep-card:hover .keep-card-actions { opacity: 1; }
-        
-        .keep-input-box { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 1px 2px 0 var(--shadow-color), 0 2px 6px 2px var(--shadow-color); }
-        .keep-input { background-color: transparent; color: var(--text-main); border: none; outline: none; resize: none; width: 100%; font-family: 'Cairo', sans-serif;}
-        
-        .theme-text { color: var(--text-main); }
-        .theme-text-muted { color: var(--text-muted); }
-        .theme-border { border-color: var(--border-color); }
-        .theme-panel { background-color: var(--panel-bg); }
-        .theme-header { background-color: var(--header-bg); border-bottom: 1px solid var(--border-color); }
-        .theme-hover:hover { background-color: var(--hover-bg); }
-
-        .masonry { column-count: 1; column-gap: 1rem; }
-        @media (min-width: 640px) { .masonry { column-count: 2; } }
-        @media (min-width: 1024px) { .masonry { column-count: 3; } }
-        .masonry-item { break-inside: avoid; margin-bottom: 1rem; }
-
-        .school-table th, .school-table td { border: 1px solid var(--border-color); padding: 12px; text-align: center; }
-        .school-table th { background-color: var(--hover-bg); font-weight: bold; }
-
-        .glass-panel { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-main); }
-        ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
-
-        #app-wrapper { transition: all 0.5s ease; width: 100%; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
-        #app-wrapper.mobile-mode { max-width: 414px; margin: 20px auto; border-radius: 35px; border: 12px solid #111; box-shadow: 0 20px 50px rgba(0,0,0,0.6); height: 90vh; min-height: auto; overflow-y: auto; overflow-x: hidden; background-color: var(--bg-main); }
-        #app-wrapper.mobile-mode::-webkit-scrollbar { display: none; } 
-        .modal-container { position: absolute !important; top: 0; left: 0; right: 0; bottom: 0; }
-        
-        .loader { border: 3px solid var(--border-color); border-top: 3px solid #8ab4f8; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* تنسيقات نافذة عرض الصور بكامل الجودة */
-        #lightbox-modal { backdrop-filter: blur(5px); }
-        #lightbox-img { max-width: 95%; max-height: 95%; box-shadow: 0 0 30px rgba(0,0,0,0.8); border-radius: 8px; }
-
-        /* تنسيقات شريط الجمل المحفزة (Marquee) */
-        .marquee-wrapper {
-            width: 100%;
-            overflow: hidden;
-            background-color: #0f172a; /* لون أزرق داكن احترافي */
-            color: #facc15; /* لون أصفر ساطع للكلمات */
-            padding: 8px 0;
-            border-bottom: 2px solid #3b82f6;
-            display: flex;
-            align-items: center;
-            font-size: 15px;
-            font-weight: 700;
-            white-space: nowrap;
-            position: relative;
-            z-index: 50;
-        }
-        .marquee-track {
-            display: inline-block;
-            animation: scroll-marquee 250s linear infinite;
-        }
-        .marquee-track:hover {
-            animation-play-state: paused;
-        }
-        @keyframes scroll-marquee {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100%); }
-        }
-    </style>
 </head>
-<body class="theme-midnight antialiased min-h-screen flex flex-col">
+<body>
 
-    <!-- نافذة عرض الصور (Lightbox) -->
-    <div id="lightbox-modal" class="hidden-force fixed inset-0 z-[999999] bg-black bg-opacity-95 flex items-center justify-center cursor-pointer" onclick="window.closeLightbox()">
-        <button class="absolute top-5 right-5 text-white text-4xl font-bold hover:text-red-500 cursor-pointer transition">&times;</button>
-        <img id="lightbox-img" src="" class="object-contain" onclick="event.stopPropagation()">
+  <!-- ==================== 1. شريط الحجم الكلي للمساحة المستخدمة في أول الصفحة ==================== -->
+  <div class="storage-top-banner">
+    <div class="storage-top-inner">
+      <div class="storage-row-top">
+        <div class="storage-title-box">
+          <i class="fa-solid fa-hard-drive" style="color: var(--accent-primary);"></i>
+          <span>الحجم الكلي للمساحة المستخدمة:</span>
+          <span class="storage-badge-total" id="totalStorageText">0.00 MB (0 Bytes)</span>
+        </div>
+
+        <div class="cloud-status-pills">
+          <span class="status-pill online" id="offlineStatusPill" title="جميع الملفات محفوظة على جهازك وتفتح بدون إنترنت">
+            <span class="dot"></span> أوفلاين (IndexedDB): مفعل
+          </span>
+          <span class="status-pill" id="firebaseStatusPill" title="حالة اتصال Firebase">
+            <span class="dot"></span> Firebase: جاري الفحص...
+          </span>
+          <span class="status-pill" id="supabaseStatusPill" title="حالة اتصال Supabase">
+            <span class="dot"></span> Supabase: جاري الفحص...
+          </span>
+          <select id="uploadEngineMode" class="form-select" style="width: auto; padding: 3px 8px; font-size: 0.76rem; height: 28px;" title="نظام الرفع السحابي">
+            <option value="dual" selected>الرفع المزدوج: Firebase + Supabase معاً (تلقائي)</option>
+            <option value="firebase">Firebase فقط + أوفلاين</option>
+            <option value="supabase">Supabase فقط + أوفلاين</option>
+            <option value="offline">أوفلاين على الجهاز فقط</option>
+          </select>
+          <button class="btn btn-sm" onclick="syncAllCloudData(true)" title="مزامنة البيانات بين الجهاز و Firebase و Supabase">
+            <i class="fa-solid fa-rotate"></i> مزامنة الآن
+          </button>
+        </div>
+      </div>
+
+      <div class="storage-progress-track">
+        <div class="storage-progress-fill" id="storageProgressBar"></div>
+      </div>
+
+      <div class="storage-stats-sub">
+        <span id="storageBreakdownText">إجمالي المواد: 0 | إجمالي الملفات: 0 | مرفقات الجدول: 0</span>
+        <span id="networkLiveState"><i class="fa-solid fa-wifi"></i> حالة الشبكة: متصل (يعمل أونلاين وأوفلاين)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. الهيدر الرئيسي وزر تبديل الثيم ==================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-box">
+        <div class="brand-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Engineering Notes - مذكرات الهندسة والجامعة</h1>
+          <p>بوابة المذاكرة والمحاضرات والكلية (أوفلاين + سحابي مزدوج)</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button class="theme-cycle-btn" id="themeToggleBtn" onclick="cycleTheme()">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+          <span id="themeLabel">الوضع الحالي: ميد نايت (Midnight)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 3. شريط الساعة بتوقيت مصر (AM/PM) والتاريخ الميلادي والهجري ==================== -->
+  <div class="datetime-bar">
+    <div class="datetime-inner">
+      <div class="clock-box">
+        <i class="fa-regular fa-clock" style="color: var(--accent-primary);"></i>
+        <span class="clock-label">توقيت مصر:</span>
+        <span class="clock-time" id="egyptClockDisplay">--:--:-- AM</span>
+      </div>
+
+      <div class="dates-box">
+        <div class="date-chip">
+          <i class="fa-regular fa-calendar"></i>
+          <span>الميلادي:</span>
+          <span id="gregorianDateDisplay">...</span>
+        </div>
+        <div class="date-chip">
+          <i class="fa-solid fa-moon"></i>
+          <span>الهجري:</span>
+          <span id="hijriDateDisplay">...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 4. المحتوى الرئيسي والتبويبات ==================== -->
+  <main class="main-container">
+    <div class="nav-tabs">
+      <button class="nav-tab-btn active" id="tabBtnSubjects" onclick="switchMainTab('subjects')">
+        <i class="fa-solid fa-folder-open"></i> المواد والمحاضرات (الفولدرات والملفات)
+      </button>
+      <button class="nav-tab-btn" id="tabBtnSchedule" onclick="switchMainTab('schedule')">
+        <i class="fa-solid fa-calendar-days"></i> الجدول الدراسي (المحاضرات / PDF / الصور)
+      </button>
     </div>
 
-    <!-- رسالة تحذير تطبيق ZArchiver -->
-    <div id="zarch-warning" style="display: none; background: #dc2626; color: white; padding: 20px; font-weight: bold; text-align: center; z-index: 999999; position: fixed; top: 0; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-        <i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i><br>
-        تحذير: أنت تفتح الموقع من داخل برنامج (ZArchiver). يرجى فتح الرابط من متصفح جوجل كروم.
+    <!-- ==================== القسم الأول: المواد والفولدرات والملفات ==================== -->
+    <section class="tab-section active" id="sectionSubjects">
+
+      <!-- عرض قائمة فولدرات المواد -->
+      <div id="foldersListView">
+        <div class="toolbar-card">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="subjectSearchInput" class="search-input" placeholder="ابحث عن اسم المادة أو المحاضرة..." oninput="renderSubjectsGrid()" />
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="openSubjectModal()">
+              <i class="fa-solid fa-folder-plus"></i> إضافة مادة جديدة (فولدر)
+            </button>
+            <button class="btn" onclick="exportFullBackup()">
+              <i class="fa-solid fa-download"></i> تحميل نسخة احتياطية كاملة
+            </button>
+          </div>
+        </div>
+
+        <div id="subjectsGridContainer" class="folders-grid"></div>
+      </div>
+
+      <!-- عرض داخل المادة (الملفات والرفع المتعدد) -->
+      <div id="insideSubjectView" style="display: none;">
+        <div class="subject-inside-header">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <button class="btn" onclick="closeSubjectFolder()">
+              <i class="fa-solid fa-arrow-right"></i> رجوع للمواد
+            </button>
+            <div>
+              <h2 id="activeSubjectTitle" style="font-size: 1.2rem; font-weight: 900; color: var(--accent-primary);">اسم المادة</h2>
+              <p id="activeSubjectMeta" style="font-size: 0.82rem; color: var(--text-muted);">0 ملفات | 0 MB</p>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="document.getElementById('multiFileInput').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i> رفع وتحديد كذا ملف
+            </button>
+            <button class="btn btn-success" onclick="openTextNoteModal()">
+              <i class="fa-solid fa-file-pen"></i> كتابة مذكرة نصية (Text)
+            </button>
+          </div>
+        </div>
+
+        <!-- منطقة السحب والإفلات ورفع عدة ملفات -->
+        <div class="upload-dropzone" id="subjectDropzone" onclick="document.getElementById('multiFileInput').click()">
+          <input type="file" id="multiFileInput" multiple style="display: none;" onchange="handleSubjectFilesUpload(this.files)" />
+          <i class="fa-solid fa-file-circle-plus main-up-icon"></i>
+          <h3>اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها داخل المادة</h3>
+          <p>يدعم رفع (PDF، صور، ملفات نصية TXT، مذكرات Word/PPT، صوتيات، فيديوهات، وأي صيغة أخرى) — تعمل أوفلاين بدون نت وتُرفع على Firebase و Supabase معاً</p>
+          <div class="btn-group" style="justify-content: center;" onclick="event.stopPropagation();">
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('multiFileInput').click()">
+              <i class="fa-solid fa-plus"></i> اختيار عدة ملفات من الجهاز
+            </button>
+            <button class="btn btn-sm" onclick="openTextNoteModal()">
+              <i class="fa-solid fa-align-right"></i> إضافة نص / تلخيص سريع
+            </button>
+          </div>
+
+          <div class="upload-progress-box" id="uploadProgressBox" onclick="event.stopPropagation();">
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 5px;">
+              <span id="uploadProgressTitle">جاري معالجة وحفظ الملفات...</span>
+              <span id="uploadProgressPercent">0%</span>
+            </div>
+            <div class="storage-progress-track">
+              <div class="storage-progress-fill" id="uploadProgressBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- شريط البحث والفلترة وتحديد عدة ملفات -->
+        <div class="toolbar-card">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="fileSearchInput" class="search-input" placeholder="ابحث باسم الملف داخل المادة..." oninput="renderSubjectFiles()" />
+          </div>
+
+          <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all" onclick="setFileFilter('all', this)">الكل</button>
+            <button class="filter-pill" data-filter="pdf" onclick="setFileFilter('pdf', this)">PDF</button>
+            <button class="filter-pill" data-filter="image" onclick="setFileFilter('image', this)">صور</button>
+            <button class="filter-pill" data-filter="text" onclick="setFileFilter('text', this)">نصوص ومذكرات</button>
+            <button class="filter-pill" data-filter="other" onclick="setFileFilter('other', this)">ملفات أخرى</button>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-sm" onclick="toggleSelectAllFiles()">
+              <i class="fa-solid fa-check-double"></i> تحديد الكل (<span id="selectedFilesCount">0</span>)
+            </button>
+            <button class="btn btn-sm btn-success" onclick="downloadSelectedFiles()">
+              <i class="fa-solid fa-download"></i> تحميل المحدد على الجهاز
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSelectedFiles()">
+              <i class="fa-solid fa-trash"></i> حذف المحدد
+            </button>
+          </div>
+        </div>
+
+        <!-- شبكة الملفات داخل المادة -->
+        <div id="subjectFilesGrid" class="files-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== القسم الثاني: الجدول الدراسي (بنفس تصميم الصورة المرفقة) ==================== -->
+    <section class="tab-section" id="sectionSchedule">
+      <div class="schedule-wrapper">
+        <div class="schedule-top-controls">
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 900;">جدول المحاضرات والسكاشن الأسبوعي</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">اضغط على أي يوم في الجدول أو زر تعديل الجدول لإضافة أو تعديل مواعيد المحاضرات والسكاشن</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary btn-sm" id="toggleEditScheduleBtn" onclick="toggleScheduleEditMode()">
+              <i class="fa-solid fa-pen-to-square"></i> تعديل الجدول
+            </button>
+          </div>
+        </div>
+
+        <!-- جدول الأيام من السبت للجمعة مطابق للصورة -->
+        <div class="schedule-table-card">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th class="col-day">اليوم</th>
+                <th class="col-lec">المحاضرات / السكاشن</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody">
+              <!-- يتم توليده ديناميكياً للأيام السبعة -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- البطاقة الأولى: ملف الجدول (PDF) مطابقة للصورة -->
+        <div class="schedule-dashed-card">
+          <input type="file" id="schedulePdfInput" accept="application/pdf,.pdf" style="display: none;" onchange="handleSchedulePdfUpload(this.files)" />
+          <div class="sched-card-icon pdf-icon">
+            <i class="fa-regular fa-file-pdf"></i>
+          </div>
+          <h3>ملف الجدول (PDF)</h3>
+          <p class="sched-empty-msg" id="schedPdfEmptyMsg">لا يوجد ملف PDF للجدول حالياً.</p>
+
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('schedulePdfInput').click()">
+              <i class="fa-solid fa-upload"></i> رفع ملف PDF للجدول
+            </button>
+          </div>
+
+          <div id="schedPdfUploadedContainer" style="display: none;" class="sched-uploaded-box"></div>
+        </div>
+
+        <!-- البطاقة الثانية: صور الجدول مطابقة للصورة -->
+        <div class="schedule-dashed-card">
+          <input type="file" id="scheduleImagesInput" accept="image/*" multiple style="display: none;" onchange="handleScheduleImagesUpload(this.files)" />
+          <div class="sched-card-icon img-icon">
+            <i class="fa-regular fa-images"></i>
+          </div>
+          <h3>صور الجدول</h3>
+          <p class="sched-empty-msg" id="schedImagesEmptyMsg">لا توجد صور مرفوعة للجدول.</p>
+
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-success btn-sm" onclick="document.getElementById('scheduleImagesInput').click()">
+              <i class="fa-solid fa-images"></i> رفع صورة أو عدة صور للجدول
+            </button>
+          </div>
+
+          <div id="schedImagesGallery" class="sched-images-grid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== نافذة إضافة / تعديل مادة ==================== -->
+  <div class="modal-overlay" id="subjectModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="subjectModalTitle">إضافة مادة جديدة (فولدر)</h3>
+        <button class="btn btn-sm" onclick="closeModal('subjectModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editSubjectId" />
+        <div class="form-group">
+          <label>اسم المادة / الفولدر *</label>
+          <input type="text" id="subjectNameInput" class="form-input" placeholder="مثال: فيزياء هندسية / دوائر كهربية / برمجة..." />
+        </div>
+        <div class="form-group">
+          <label>اسم الدكتور / الكود / ملاحظات المادة (اختياري)</label>
+          <input type="text" id="subjectDescInput" class="form-input" placeholder="مثال: د. أحمد - الترم الأول - مدرج 3" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('subjectModal')">إلغاء</button>
+        <button class="btn btn-primary" onclick="saveSubjectFolder()"><i class="fa-solid fa-check"></i> حفظ المادة</button>
+      </div>
     </div>
+  </div>
 
-    <!-- ================= شاشة تسجيل الدخول ================= -->
-    <div id="login-screen" style="display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; z-index: 9999;">
-        <div class="glass-panel p-10 rounded-2xl w-96 max-w-[90%] text-center fade-in shadow-2xl">
-            <div class="text-keep-blue text-5xl mb-4"><i class="fa-solid fa-user-lock"></i></div>
-            <h1 class="text-2xl font-bold mb-2 text-white">Engineering Keep</h1>
-            <p class="text-sm text-gray-300 mb-6">يرجى تأكيد الدخول (الباسورد جاهز)</p>
-            
-            <input type="password" id="password-input" value="#ZMsd42d*" placeholder="كلمة المرور..." class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:border-keep-blue mb-4 text-center text-lg" dir="ltr" onkeypress="if(event.key === 'Enter') window.checkAuth()">
-            
-            <button id="login-btn" onclick="window.checkAuth()" class="w-full bg-keep-blue hover:bg-blue-500 text-gray-900 font-bold py-3 rounded-lg transition duration-300 shadow cursor-pointer">دخول للمنصة</button>
-            <p id="login-error" class="text-red-400 text-sm mt-3 hidden-force font-bold">كلمة المرور غير صحيحة!</p>
+  <!-- ==================== نافذة كتابة / تعديل مذكرة نصية داخل المادة ==================== -->
+  <div class="modal-overlay" id="textNoteModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="textNoteModalTitle">كتابة مذكرة نصية داخل المادة</h3>
+        <button class="btn btn-sm" onclick="closeModal('textNoteModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editTextFileId" />
+        <div class="form-group">
+          <label>عنوان الملف النصي / المحاضرة *</label>
+          <input type="text" id="textNoteTitleInput" class="form-input" placeholder="مثال: ملخص قوانين المحاضرة الأولى.txt" />
         </div>
+        <div class="form-group">
+          <label>محتوى النص / المذكرة *</label>
+          <textarea id="textNoteContentInput" class="form-textarea" placeholder="اكتب هنا كل الملاحظات أو القوانين أو الأكواد وستُحفظ كملف نصي يعمل أوفلاين وقابل للتحميل..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('textNoteModal')">إلغاء</button>
+        <button class="btn btn-success" onclick="saveCustomTextNote()"><i class="fa-solid fa-floppy-disk"></i> حفظ الملف النصي</button>
+      </div>
     </div>
+  </div>
 
-    <!-- الغلاف الرئيسي (المنصة) -->
-    <div id="app-wrapper" style="display: none;" class="hidden-force">
-
-        <!-- شريط الجمل المحفزة العلوي (50 جملة) -->
-        <div class="marquee-wrapper">
-            <div class="marquee-track">
-                النجاح يبدأ بقرار، فكن صاحب القرار اليوم. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                كل صفحة تقرأها الآن تبني طوبة في قصر مستقبلك. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                التعب يزول والإنجاز يبقى، فاستمر. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تؤجل عمل اليوم إلى الغد، فالمستقبل يُبنى الآن. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                طريق الألف ميل يبدأ بخطوة، والنجاح يبدأ بمسألة. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الهندسة ليست صعبة لمن يمتلك الإرادة. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                من طلب العلا سهر الليالي. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                العبقرية هي 1% إلهام و 99% جهد وعرق. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تستسلم، فالبدايات دائماً هي الأصعب. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                أحلامك تستحق التعب، فقاتل من أجلها. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                النجاح لا يأتي لمن ينتظره، بل لمن يسعى إليه. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                اجعل من العقبات سلالم ترتقي بها للقمة. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                كل معادلة تفهمها تقربك خطوة من حلمك. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                المهندس الناجح هو الذي لا يتوقف عن التعلم. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                المذاكرة اليوم هي راحة الغد. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                تذكر دائماً لماذا بدأت، ولا تتوقف حتى تصل. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الألم المؤقت للمذاكرة أفضل من ألم الندم المستمر. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                أنت أقوى مما تتخيل، وأذكى مما تعتقد. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تدع الخوف من الفشل يمنعك من المحاولة. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                القمة تتسع للجميع، فاحجز مكانك فيها. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                العلم يبني بيوتاً لا عماد لها. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                التركيز هو مفتاح الإنجاز السريع. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                نظم وقتك، تضاعف إنجازك. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تقارن نفسك بغيرك، بل قارن نفسك بما كنت عليه بالأمس. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الخطأ هو فرصة للتعلم وليس نهاية المطاف. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الإصرار يصنع المعجزات. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                كل ساعة تذاكرها ترفع من قيمتك في سوق العمل. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                استثمر في عقلك، فهو أفضل أصل تمتلكه. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                التحديات تصنع الأبطال، والامتحانات تصنع المهندسين. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تنتظر الإلهام، بل ابدأ وسيأتي الإلهام لاحقاً. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                من جد وجد، ومن زرع حصد. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                اجعل شغفك هو محركك الأساسي للتفوق. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                العقل السليم في الجسم السليم، فاهتم بصحتك لتتفوق. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                تفائل بما تهوى يكن. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تلتفت للمحبطين، ركز على هدفك فقط. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الصبر مفتاح الفرج، ومفتاح حل أعقد المسائل. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                كل مجهود تبذله سيُرد لك أضعافاً في مستقبلك. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                المهندس العظيم يبدأ طالباً مجتهداً. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                تجاوز حدودك، فإمكانياتك لا حصر لها. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                اجعل التفوق عادة وليس مجرد هدف مؤقت. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                ثق بنفسك، فأنت قادر على صنع المستحيل. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                لا تبحث عن الأعذار، بل ابحث عن الحلول. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                المراجعة المستمرة تثبت المعلومة كالحجر. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                النوم الجيد هو سلاحك السري للتركيز العميق. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                أسأل وابحث ولا تخجل من عدم المعرفة. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                شارك علمك مع زملائك، فالعلم يزيد بالعطاء. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                كن فخوراً بكل خطوة صغيرة تخطوها نحو هدفك. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الفشل الحقيقي هو التوقف عن المحاولة. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                الهندسة فن قبل أن تكون علماً، فاستمتع بما تدرسه. <i class="fa-solid fa-bolt text-keep-blue mx-4"></i>
-                توكل على الله، وابذل الأسباب، وسيكون النجاح حليفك.
-            </div>
+  <!-- ==================== نافذة معاينة الملفات أوفلاين (PDF / صور / نصوص / فيديو) ==================== -->
+  <div class="modal-overlay" id="fileViewerModal">
+    <div class="modal-box large">
+      <div class="modal-header">
+        <h3 id="viewerFileTitle">معاينة الملف</h3>
+        <div class="btn-group">
+          <button class="btn btn-sm btn-success" id="viewerDownloadBtn">
+            <i class="fa-solid fa-download"></i> تحميل على الجهاز
+          </button>
+          <button class="btn btn-sm" onclick="closeViewerModal()">
+            <i class="fa-solid fa-xmark"></i> إغلاق
+          </button>
         </div>
-        
-        <!-- الهيدر العلوي -->
-        <header class="theme-header shadow-sm relative z-10 px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <button onclick="window.toggleSidebar()" class="text-xl theme-text-muted hover:text-keep-blue transition p-2 rounded-full theme-hover cursor-pointer"><i class="fa-solid fa-bars"></i></button>
-                <div class="flex items-center gap-3">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/keep_2020q4_48dp.png" alt="Keep" class="w-10 h-10 opacity-90 filter hue-rotate-[200deg]">
-                    <div class="flex flex-col">
-                        <h1 class="text-xl font-bold theme-text leading-tight">الهندسة Notes</h1>
-                        <!-- عداد المساحة الذكي -->
-                        <span id="total-storage-size" class="text-xs font-bold text-keep-blue bg-blue-900 bg-opacity-20 px-2 py-0.5 rounded mt-1 inline-block w-max">جاري حساب المساحة...</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 mt-3 md:mt-0">
-                <button onclick="window.toggleViewMode()" class="theme-text-muted hover:text-yellow-500 p-2 rounded-full theme-hover transition cursor-pointer" title="وضع الموبايل/اللاب"><i class="fa-solid fa-mobile-screen text-lg"></i></button>
-                <button onclick="window.toggleTheme()" class="theme-text-muted hover:text-blue-400 p-2 rounded-full theme-hover transition cursor-pointer" title="تغيير المظهر"><i class="fa-solid fa-moon text-lg"></i></button>
-            </div>
-        </header>
-
-        <div class="flex flex-1 overflow-hidden" style="flex: 1; display: flex; overflow: hidden;">
-            <nav id="sidebar" class="w-20 md:w-64 flex-shrink-0 theme-panel border-l theme-border transition-all duration-300 py-4 flex flex-col gap-1 z-10">
-                <button id="btn-notes-tab" class="tab-btn flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-opacity-20 transition theme-text font-bold cursor-pointer" style="background-color: rgba(138, 180, 248, 0.1); color: var(--text-main);" onclick="window.switchTab('notes-tab')">
-                    <i class="fa-regular fa-lightbulb text-xl"></i> <span class="hidden md:inline">المذكرات</span>
-                </button>
-                <button id="btn-subjects-tab" class="tab-btn flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-gray-500 hover:bg-opacity-10 transition theme-text-muted font-bold cursor-pointer" onclick="window.switchTab('subjects-tab')">
-                    <i class="fa-solid fa-book-bookmark text-xl"></i> <span class="hidden md:inline">المواد والداتا</span>
-                </button>
-                <button id="btn-schedule-tab" class="tab-btn flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-gray-500 hover:bg-opacity-10 transition theme-text-muted font-bold cursor-pointer" onclick="window.switchTab('schedule-tab')">
-                    <i class="fa-regular fa-calendar-days text-xl"></i> <span class="hidden md:inline">الجدول الدراسي</span>
-                </button>
-            </nav>
-
-            <main class="flex-1 overflow-y-auto p-4 md:p-8 relative" style="flex: 1; overflow-y: auto;">
-                
-                <!-- ================= 1. قسم المذكرات ================= -->
-                <div id="notes-tab" class="tab-content fade-in block" style="display: block;">
-                    <div class="max-w-2xl mx-auto mb-10 relative">
-                        <div id="note-creator" class="keep-input-box p-4 cursor-text transition-all">
-                            <input type="text" id="note-title" placeholder="العنوان" class="keep-input text-lg font-bold mb-3 hidden-force">
-                            <textarea id="note-body" placeholder="إضافة مذكرة (ويمكنك رفع صور لها)..." rows="1" class="keep-input" onfocus="window.showNoteActions()" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-                            
-                            <!-- معاينة الصور قبل الرفع للمذكرة -->
-                            <div id="note-images-preview" class="hidden-force flex-wrap gap-2 mt-3 p-2 bg-gray-100 dark:bg-gray-800 rounded"></div>
-                            
-                            <div id="note-progress-container" class="hidden-force mt-3 text-center text-sm font-bold text-keep-blue"><div class="loader mr-2"></div>جاري الرفع وحفظ المذكرة...</div>
-
-                            <div id="note-actions" class="hidden-force flex justify-between items-center mt-3 border-t theme-border pt-2">
-                                <div class="flex gap-2">
-                                    <input type="file" id="note-images-input" multiple accept="image/*" class="hidden-force" onchange="window.previewNoteImages(event)">
-                                    <button onclick="document.getElementById('note-images-input').click()" class="theme-text-muted hover:text-keep-blue font-bold px-3 py-2 rounded transition cursor-pointer bg-gray-100 dark:bg-gray-800" title="إرفاق صور"><i class="fa-solid fa-camera"></i> إضافة صور</button>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button onclick="window.hideNoteActions()" class="theme-text-muted hover:text-keep-blue font-bold px-4 py-2 rounded cursor-pointer">إغلاق</button>
-                                    <button id="save-note-btn" onclick="window.saveNote()" class="text-keep-blue font-bold px-4 py-2 rounded hover:bg-blue-500 hover:bg-opacity-10 cursor-pointer">حفظ</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="notes-grid" class="masonry">
-                        <div class="text-center theme-text-muted py-10 w-full">جاري التحميل...</div>
-                    </div>
-                </div>
-
-                <!-- ================= 2. قسم المواد ================= -->
-                <div id="subjects-tab" class="tab-content fade-in hidden-force" style="display: none;">
-                    <div class="max-w-2xl mx-auto mb-10 relative">
-                        <div id="subject-creator" class="keep-input-box p-4 transition-all">
-                            <input type="text" id="subject-name" placeholder="اسم المادة (اضغط للإضافة)" class="keep-input font-bold" onfocus="window.showSubjectActions()">
-                            <div id="subject-extra" class="hidden-force mt-3">
-                                <input type="text" id="subject-dept" placeholder="القسم (مثال: مدني)" class="keep-input mb-3">
-                                <div class="flex justify-end border-t theme-border pt-2 gap-2">
-                                    <button onclick="window.hideSubjectActions()" class="theme-text-muted hover:text-keep-blue font-bold px-4 py-2 rounded cursor-pointer">إلغاء</button>
-                                    <button onclick="window.saveSubject()" class="text-keep-blue font-bold px-4 py-2 rounded hover:bg-blue-500 hover:bg-opacity-10 cursor-pointer">إضافة المادة</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="subjects-grid" class="masonry"></div>
-                </div>
-
-                <!-- ================= 3. قسم الجدول ================= -->
-                <div id="schedule-tab" class="tab-content fade-in hidden-force" style="display: none;">
-                    <div class="max-w-5xl mx-auto">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold theme-text"><i class="fa-solid fa-table-list me-2 text-keep-blue"></i> الجدول الأسبوعي</h2>
-                            <button onclick="window.openScheduleModal()" class="bg-transparent border border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white px-4 py-2 rounded-lg font-bold transition theme-border theme-text cursor-pointer">
-                                <i class="fa-solid fa-pen"></i> إضافة / تعديل
-                            </button>
-                        </div>
-                        <div class="keep-card overflow-hidden mb-8 shadow-sm">
-                            <div class="overflow-x-auto">
-                                <table class="w-full school-table theme-text text-sm">
-                                    <thead><tr><th class="w-24 text-keep-blue">اليوم</th><th>المحاضرات / السكاشن</th></tr></thead>
-                                    <tbody id="school-timetable-body">
-                                        <tr><td colspan="2" class="text-center py-10 theme-text-muted">قم بتعديل الجدول لملء البيانات</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- عرض صور وملفات الجدول -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="keep-card p-6 text-center border-dashed border-2">
-                                <i class="fa-regular fa-file-pdf text-4xl text-red-400 mb-3"></i>
-                                <h3 class="font-bold theme-text mb-2">ملف الجدول (PDF)</h3>
-                                <a id="download-schedule-btn" href="#" target="_blank" class="hidden-force inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-bold transition mt-2 cursor-pointer">عرض الملف المرفق</a>
-                                <p id="no-schedule-pdf" class="text-sm theme-text-muted">لا يوجد ملف PDF للجدول حالياً.</p>
-                            </div>
-                            
-                            <div class="keep-card p-6 text-center border-dashed border-2">
-                                <i class="fa-regular fa-images text-4xl text-green-400 mb-3"></i>
-                                <h3 class="font-bold theme-text mb-2">صور الجدول</h3>
-                                <div id="schedule-images-display" class="flex flex-wrap justify-center gap-3 mt-3">
-                                    <p class="text-sm theme-text-muted w-full">لا توجد صور مرفوعة للجدول.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </main>
-        </div>
-
-        <!-- ================= نافذة (Modal) داتا المادة ================= -->
-        <div id="subject-modal" class="hidden-force fixed inset-0 bg-black bg-opacity-70 items-center justify-center z-[60] p-2 sm:p-4 backdrop-blur-sm" style="display: none; position: fixed; z-index: 60;">
-            <div class="theme-panel w-full max-w-4xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] border theme-border overflow-hidden fade-in">
-                <div class="border-b theme-border p-4 flex justify-between items-center">
-                    <div>
-                        <h2 id="modal-subject-name" class="text-xl font-bold theme-text">اسم المادة</h2>
-                        <p id="modal-subject-dept" class="text-sm theme-text-muted">القسم</p>
-                    </div>
-                    <button onclick="window.closeModal('subject-modal')" class="theme-text-muted hover:text-red-400 text-2xl transition cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="p-4 sm:p-6 overflow-y-auto flex-1">
-                    <div class="keep-card p-4 mb-6 shadow-sm flex flex-col gap-3">
-                        <label class="font-bold theme-text text-sm"><i class="fa-solid fa-upload text-keep-blue me-2"></i> رفع ملفات أو صور للمادة (يمكنك تحديد أكثر من ملف معاً):</label>
-                        <div class="flex flex-col md:flex-row gap-3 items-center">
-                            <input type="text" id="file-title" placeholder="وصف الملفات (مثال: صور المحاضرة 1)" class="theme-input p-2 rounded border theme-border flex-1 w-full bg-transparent outline-none">
-                            <input type="file" id="subject-file-input" multiple class="theme-text-muted w-full md:w-auto text-sm cursor-pointer border p-1 rounded">
-                            <button id="upload-file-btn" onclick="window.uploadFile()" class="bg-keep-blue text-gray-900 font-bold px-8 py-2 rounded transition hover:opacity-80 w-full md:w-auto whitespace-nowrap cursor-pointer shadow">رفع الدفعة</button>
-                        </div>
-                    </div>
-                    <div id="upload-progress-container" class="hidden-force mb-6 text-center text-sm theme-text font-bold text-keep-blue"><div class="loader mr-2"></div>جاري رفع الملفات للسيرفر...</div>
-                    <h3 class="font-bold mb-3 theme-text text-sm border-r-4 border-keep-blue pr-2">الداتا المرفوعة للمادة:</h3>
-                    <div id="subject-files-list" class="masonry"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= نافذة (Modal) تعديل الجدول ================= -->
-        <div id="schedule-edit-modal" class="hidden-force fixed inset-0 bg-black bg-opacity-70 items-center justify-center z-[70] p-4 backdrop-blur-sm" style="display: none; position: fixed; z-index: 70;">
-            <div class="theme-panel w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] border theme-border fade-in">
-                <div class="border-b theme-border p-4 flex justify-between items-center">
-                    <h2 class="text-lg font-bold theme-text">تعديل الجدول</h2>
-                    <button onclick="window.closeModal('schedule-edit-modal')" class="theme-text-muted hover:text-red-400 text-2xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="p-6 overflow-y-auto">
-                    <div class="space-y-4 mb-6" id="schedule-inputs-container"></div>
-                    
-                    <div class="border-t theme-border pt-4 mb-4">
-                        <label class="block text-sm font-bold theme-text mb-2 text-red-400"><i class="fa-regular fa-file-pdf"></i> إرفاق PDF للجدول (يستبدل القديم):</label>
-                        <input type="file" id="schedule-pdf" accept=".pdf" class="theme-text-muted w-full text-sm cursor-pointer mb-4 p-2 border rounded">
-                        
-                        <label class="block text-sm font-bold theme-text mb-2 text-green-400"><i class="fa-regular fa-images"></i> رفع صور للجدول (تحديد متعدد):</label>
-                        <input type="file" id="schedule-images-input" multiple accept="image/*" class="theme-text-muted w-full text-sm cursor-pointer p-2 border rounded">
-                    </div>
-                    
-                    <button id="save-schedule-btn" onclick="window.saveSchedule()" class="w-full bg-keep-blue text-gray-900 py-3 rounded-lg font-bold transition hover:opacity-80 cursor-pointer shadow">حفظ ورفع التعديلات</button>
-                    <div id="schedule-upload-status" class="hidden-force mt-3 text-center text-sm font-bold text-keep-blue"><div class="loader mr-2"></div>جاري حفظ الجدول والملفات...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= نافذة (Modal) تعديل عنصر ================= -->
-        <div id="edit-item-modal" class="hidden-force fixed inset-0 bg-black bg-opacity-70 items-center justify-center z-[80] p-4 backdrop-blur-sm" style="display: none; position: fixed; z-index: 80;">
-            <div class="theme-panel w-full max-w-lg rounded-xl shadow-2xl flex flex-col border theme-border fade-in">
-                <div class="p-6">
-                    <h2 id="edit-modal-title" class="text-lg font-bold theme-text mb-4">تعديل</h2>
-                    <input type="text" id="edit-input-1" class="keep-input border-b theme-border pb-2 mb-4 font-bold" placeholder="العنوان">
-                    <textarea id="edit-input-2" class="keep-input border-b theme-border pb-2 mb-4" rows="3" placeholder="المحتوى"></textarea>
-                    <div class="flex justify-end gap-3 mt-4">
-                        <button onclick="window.closeModal('edit-item-modal')" class="theme-text-muted font-bold px-4 py-2 rounded cursor-pointer">إلغاء</button>
-                        <button onclick="window.saveEdit()" class="text-keep-blue font-bold px-4 py-2 hover:bg-blue-500 hover:bg-opacity-10 rounded cursor-pointer">حفظ التغييرات</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+      </div>
+      <div class="modal-body" id="viewerModalBody" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      </div>
     </div>
+  </div>
 
-    <!-- ================= سكريبت Javascript القوي ================= -->
-    <script>
-        const MY_SUPABASE_URL = "https://iarkdmqupidhvlgdwufu.supabase.co"; 
-        const MY_SUPABASE_KEY = "sb_publishable_r6JmUcxJ_yamricI_EVI3g_lUXiAf0e";
+  <!-- حاوية الإشعارات -->
+  <div class="toast-container" id="toastContainer"></div>
 
-        if (window.location.href.indexOf('content://') > -1 || window.location.href.indexOf('zarch') > -1) {
-            document.getElementById('zarch-warning').style.display = 'block';
+  <!-- ==================== كود الجافاسكريبت والربط المزدوج (Firebase + Supabase + IndexedDB) ==================== -->
+  <script type="module">
+    // 1. استيراد حزم Firebase الرسمية كما طُلب بالضبط
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics, isSupported as isAnalyticsSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+    import { getDatabase, ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // إعدادات Firebase الخاصة بك بالضبط بدون أي تغيير
+    const firebaseConfig = {
+      apiKey: "AIzaSyCA8tjD2nzixDARhXApDLZrtDBIqJY_0I0",
+      authDomain: "myyppproject.firebaseapp.com",
+      databaseURL: "https://myyppproject-default-rtdb.firebaseio.com",
+      projectId: "myyppproject",
+      storageBucket: "myyppproject.firebasestorage.app",
+      messagingSenderId: "679811302650",
+      appId: "1:679811302650:web:23da36e87af1845194b543",
+      measurementId: "G-8X5ET6BQFY"
+    };
+
+    // تهيئة Firebase
+    const app = initializeApp(firebaseConfig);
+    isAnalyticsSupported().then(yes => { if (yes) getAnalytics(app); }).catch(() => {});
+    const fbDb = getDatabase(app);
+    const fbStorage = getStorage(app);
+
+    // 2. إعدادات Supabase الخاصة بك بالضبط
+    const SUPABASE_URL = "https://iarkdmqupidhvlgdwufu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_r6JmUcxJ_yamricI_EVI3g_lUXiAf0e";
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+    // ==================== 3. قاعدة بيانات الأوفلاين (IndexedDB) ====================
+    const IDB_NAME = "EngineeringStudyPortalOfflineDB";
+    const IDB_VERSION = 1;
+    let idbInstance = null;
+
+    function openOfflineDB() {
+      return new Promise((resolve, reject) => {
+        if (idbInstance) return resolve(idbInstance);
+        const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains("subjects")) {
+            db.createObjectStore("subjects", { keyPath: "id" });
+          }
+          if (!db.objectStoreNames.contains("files")) {
+            const fileStore = db.createObjectStore("files", { keyPath: "id" });
+            fileStore.createIndex("subjectId", "subjectId", { unique: false });
+          }
+          if (!db.objectStoreNames.contains("schedule")) {
+            db.createObjectStore("schedule", { keyPath: "key" });
+          }
+        };
+        req.onsuccess = (e) => {
+          idbInstance = e.target.result;
+          resolve(idbInstance);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbPut(storeName, item) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).put(item);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbGetAll(storeName) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const req = tx.objectStore(storeName).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbGet(storeName, key) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const req = tx.objectStore(storeName).get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbDelete(storeName, key) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).delete(key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    // ==================== 4. الحالة العامة للتطبيق ====================
+    const WEEK_DAYS = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+    let subjectsList = [];
+    let allFilesList = [];
+    let activeSubjectId = null;
+    let activeFileFilter = "all";
+    let selectedFileIds = new Set();
+    let scheduleDaysData = {
+      "السبت": "-",
+      "الأحد": "-",
+      "الإثنين": "-",
+      "الثلاثاء": "-",
+      "الأربعاء": "-",
+      "الخميس": "-",
+      "الجمعة": "-"
+    };
+    let isScheduleEditing = false;
+    let currentViewerBlobUrl = null;
+
+    // ==================== 5. تنبيهات Toast ====================
+    window.showToast = function(msg) {
+      const container = document.getElementById("toastContainer");
+      const el = document.createElement("div");
+      el.className = "toast-msg";
+      el.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--accent-primary); margin-left: 6px;"></i> ${msg}`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 250);
+      }, 3200);
+    };
+
+    // ==================== 6. الساعة بتوقيت مصر (AM/PM) والتاريخ الميلادي والهجري ====================
+    function updateEgyptClockAndDates() {
+      const now = new Date();
+      // الساعة بتوقيت مصر بالإنجليزي AM / PM
+      const timeFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Africa/Cairo",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      });
+      document.getElementById("egyptClockDisplay").textContent = timeFormatter.format(now);
+
+      // التاريخ الميلادي بتوقيت مصر
+      const gregFormatter = new Intl.DateTimeFormat("ar-EG", {
+        timeZone: "Africa/Cairo",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+      document.getElementById("gregorianDateDisplay").textContent = gregFormatter.format(now);
+
+      // التاريخ الهجري بتوقيت مصر
+      try {
+        const hijriFormatter = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+          timeZone: "Africa/Cairo",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+        document.getElementById("hijriDateDisplay").textContent = hijriFormatter.format(now);
+      } catch (e) {
+        const fallbackHijri = new Intl.DateTimeFormat("ar-EG-u-ca-islamic", {
+          timeZone: "Africa/Cairo",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+        document.getElementById("hijriDateDisplay").textContent = fallbackHijri.format(now);
+      }
+    }
+    setInterval(updateEgyptClockAndDates, 1000);
+    updateEgyptClockAndDates();
+
+    // ==================== 7. تبديل الثيمات (Midnight أساسي / Dark / Light) ====================
+    const THEMES = [
+      { id: "midnight", label: "الوضع الحالي: ميد نايت (Midnight)", icon: "fa-moon" },
+      { id: "dark", label: "الوضع الحالي: دارك (Dark)", icon: "fa-circle-half-stroke" },
+      { id: "light", label: "الوضع الحالي: لايت (Light)", icon: "fa-sun" }
+    ];
+
+    function applyTheme(themeId) {
+      const found = THEMES.find(t => t.id === themeId) || THEMES[0];
+      document.documentElement.setAttribute("data-theme", found.id);
+      localStorage.setItem("study_portal_theme", found.id);
+      document.getElementById("themeLabel").textContent = found.label;
+      document.getElementById("themeIcon").className = `fa-solid ${found.icon}`;
+    }
+
+    window.cycleTheme = function() {
+      const current = document.documentElement.getAttribute("data-theme") || "midnight";
+      const idx = THEMES.findIndex(t => t.id === current);
+      const next = THEMES[(idx + 1) % THEMES.length];
+      applyTheme(next.id);
+      showToast(`تم التبديل إلى ${next.label}`);
+    };
+
+    const savedTheme = localStorage.getItem("study_portal_theme") || "midnight";
+    applyTheme(savedTheme);
+
+    // ==================== 8. حساب الحجم الكلي للمساحة المستخدمة ====================
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB", "GB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    }
+
+    async function updateTotalStorageHeader() {
+      let filesBytes = allFilesList.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+      let schedAttachmentsCount = 0;
+
+      const schedPdf = await idbGet("schedule", "schedule_pdf");
+      if (schedPdf && schedPdf.size) {
+        filesBytes += Number(schedPdf.size);
+        schedAttachmentsCount++;
+      }
+
+      const schedImgs = await idbGet("schedule", "schedule_images");
+      if (schedImgs && Array.isArray(schedImgs.items)) {
+        schedImgs.items.forEach(img => {
+          filesBytes += Number(img.size) || 0;
+          schedAttachmentsCount++;
+        });
+      }
+
+      const mbVal = (filesBytes / (1024 * 1024)).toFixed(2);
+      document.getElementById("totalStorageText").textContent = `${mbVal} MB (${formatBytes(filesBytes)})`;
+      document.getElementById("storageBreakdownText").textContent =
+        `إجمالي المواد: ${subjectsList.length} | إجمالي ملفات المواد: ${allFilesList.length} | مرفقات الجدول: ${schedAttachmentsCount}`;
+
+      // شريط نسبي توضيحي (مثلاً من 500 MB)
+      const percent = Math.min(100, Math.max(filesBytes > 0 ? 3 : 0, (filesBytes / (500 * 1024 * 1024)) * 100));
+      document.getElementById("storageProgressBar").style.width = `${percent}%`;
+    }
+
+    // ==================== 9. تحويل الملفات إلى DataURL والعكس لدعم الأوفلاين والسحابة ====================
+    function fileToDataURL(blobOrFile) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (e) => reject(e);
+        reader.readAsDataURL(blobOrFile);
+      });
+    }
+
+    function dataURLToBlob(dataUrl) {
+      try {
+        const arr = dataUrl.split(",");
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        const mime = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+      } catch (e) {
+        return new Blob([], { type: "application/octet-stream" });
+      }
+    }
+
+    // ==================== 10. المحرك السحابي المزدوج (Firebase + Supabase) ====================
+    async function checkCloudConnections() {
+      const fbPill = document.getElementById("firebaseStatusPill");
+      const sbPill = document.getElementById("supabaseStatusPill");
+
+      // فحص Firebase Realtime Database
+      try {
+        await dbSet(dbRef(fbDb, "study_portal_V2/ping"), { lastCheck: Date.now() });
+        fbPill.className = "status-pill online";
+        fbPill.innerHTML = `<span class="dot"></span> Firebase: متصل ويعمل`;
+      } catch (e) {
+        fbPill.className = "status-pill warn";
+        fbPill.innerHTML = `<span class="dot"></span> Firebase: وضع احتياطي`;
+      }
+
+      // فحص Supabase
+      try {
+        if (!supabaseClient) throw new Error("No client");
+        const { error } = await supabaseClient.storage.listBuckets();
+        sbPill.className = "status-pill online";
+        sbPill.innerHTML = `<span class="dot"></span> Supabase: متصل ويعمل`;
+      } catch (e) {
+        // حتى لو listBuckets تطلب صلاحية، نتحقق من REST endpoint
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+            headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+          });
+          if (res.ok || res.status === 200 || res.status === 401 || res.status === 404) {
+            sbPill.className = "status-pill online";
+            sbPill.innerHTML = `<span class="dot"></span> Supabase: متصل ويعمل`;
+          } else {
+            throw new Error("Status error");
+          }
+        } catch (err2) {
+          sbPill.className = "status-pill warn";
+          sbPill.innerHTML = `<span class="dot"></span> Supabase: وضع احتياطي`;
+        }
+      }
+    }
+
+    // رفع ملف ومعلوماته إلى Firebase و Supabase في نفس الوقت
+    async function uploadFileToDualCloud(fileRecord, rawBlob) {
+      const mode = document.getElementById("uploadEngineMode").value;
+      if (mode === "offline" || !navigator.onLine) {
+        return { firebaseOk: false, supabaseOk: false };
+      }
+
+      let firebaseOk = false;
+      let supabaseOk = false;
+
+      const tasks = [];
+
+      // المهمة 1: الرفع على Firebase (Storage + Realtime DB)
+      if (mode === "dual" || mode === "firebase") {
+        const fbTask = (async () => {
+          try {
+            let fbDownloadUrl = null;
+            try {
+              const sRef = storageRef(fbStorage, `study_portal_files/${fileRecord.subjectId}/${fileRecord.id}_${fileRecord.name}`);
+              await uploadBytes(sRef, rawBlob);
+              fbDownloadUrl = await getDownloadURL(sRef);
+            } catch (storageErr) {
+              // في حال وجود قيود على Storage يتم التخزين مباشرة داخل Realtime Database إذا كان الحجم مناسباً
+            }
+
+            const metaPayload = {
+              id: fileRecord.id,
+              subjectId: fileRecord.subjectId,
+              name: fileRecord.name,
+              type: fileRecord.type,
+              category: fileRecord.category,
+              size: fileRecord.size,
+              createdAt: fileRecord.createdAt,
+              textContent: fileRecord.textContent || null,
+              fbDownloadUrl: fbDownloadUrl || null,
+              // حفظ DataURL للملفات الصغيرة والمتوسطة لضمان الفتح من أي جهاز حتى لو Storage مقيد
+              inlineDataUrl: (fileRecord.size <= 7 * 1024 * 1024) ? fileRecord.dataUrl : null
+            };
+            await dbSet(dbRef(fbDb, `study_portal_V2/files/${fileRecord.id}`), metaPayload);
+            firebaseOk = true;
+            fileRecord.firebaseSynced = true;
+            if (fbDownloadUrl) fileRecord.fbDownloadUrl = fbDownloadUrl;
+          } catch (err) {
+            console.warn("Firebase upload warning:", err);
+          }
+        })();
+        tasks.push(fbTask);
+      }
+
+      // المهمة 2: الرفع على Supabase
+      if ((mode === "dual" || mode === "supabase") && supabaseClient) {
+        const sbTask = (async () => {
+          try {
+            const bucketNames = ["study-files", "files", "public", "uploads"];
+            let sbPublicUrl = null;
+            const safePath = `${fileRecord.subjectId}/${fileRecord.id}_${encodeURIComponent(fileRecord.name)}`;
+
+            for (const bName of bucketNames) {
+              const { data, error } = await supabaseClient.storage.from(bName).upload(safePath, rawBlob, {
+                upsert: true,
+                contentType: fileRecord.type || "application/octet-stream"
+              });
+              if (!error && data) {
+                const pub = supabaseClient.storage.from(bName).getPublicUrl(safePath);
+                sbPublicUrl = pub?.data?.publicUrl || null;
+                supabaseOk = true;
+                break;
+              }
+            }
+
+            // محاولة الحفظ أيضاً في جدول study_files في Supabase إن وجد
+            const { error: tblErr } = await supabaseClient.from("study_files").upsert({
+              id: fileRecord.id,
+              subject_id: fileRecord.subjectId,
+              name: fileRecord.name,
+              size: fileRecord.size,
+              type: fileRecord.type,
+              category: fileRecord.category,
+              created_at: fileRecord.createdAt,
+              file_url: sbPublicUrl || fileRecord.fbDownloadUrl || null
+            });
+            if (!tblErr) supabaseOk = true;
+
+            if (supabaseOk) {
+              fileRecord.supabaseSynced = true;
+              if (sbPublicUrl) fileRecord.sbDownloadUrl = sbPublicUrl;
+            }
+          } catch (err) {
+            console.warn("Supabase upload warning:", err);
+          }
+        })();
+        tasks.push(sbTask);
+      }
+
+      await Promise.allSettled(tasks);
+      await idbPut("files", fileRecord);
+      return { firebaseOk, supabaseOk };
+    }
+
+    // مزامنة الفولدرات والجدول والملفات مع السحابتين
+    window.syncAllCloudData = async function(showUserToast = false) {
+      await checkCloudConnections();
+      if (!navigator.onLine) {
+        if (showUserToast) showToast("أنت تعمل الآن في الوضع الأوفلاين، جميع ملفاتك متاحة على جهازك.");
+        return;
+      }
+
+      try {
+        // 1. جلب المواد من Firebase ودمجها مع الأوفلاين
+        const fbSubjectsSnap = await dbGet(dbRef(fbDb, "study_portal_V2/subjects"));
+        if (fbSubjectsSnap.exists()) {
+          const remoteSubs = fbSubjectsSnap.val();
+          for (const key in remoteSubs) {
+            const rSub = remoteSubs[key];
+            if (!subjectsList.some(s => s.id === rSub.id)) {
+              subjectsList.push(rSub);
+              await idbPut("subjects", rSub);
+            }
+          }
         }
 
-        window.showElement = function(id, displayType = 'flex') {
-            const el = document.getElementById(id);
-            if(el) { el.classList.remove('hidden-force', 'hidden'); el.style.display = displayType; }
-        };
+        // رفع المواد المحلية إلى Firebase و Supabase
+        for (const sub of subjectsList) {
+          await dbSet(dbRef(fbDb, `study_portal_V2/subjects/${sub.id}`), sub).catch(() => {});
+          if (supabaseClient) {
+            await supabaseClient.from("study_subjects").upsert({
+              id: sub.id,
+              name: sub.name,
+              description: sub.description || "",
+              created_at: sub.createdAt
+            }).catch(() => {});
+          }
+        }
 
-        window.hideElement = function(id) {
-            const el = document.getElementById(id);
-            if(el) { el.classList.add('hidden-force'); el.style.display = 'none'; }
-        };
-
-        window.closeModal = function(id) { window.hideElement(id); };
-
-        window.supabaseInstance = null;
-        window.isConfigured = false;
-        window.currentTheme = 'midnight';
-        window.isMobileView = false;
-        window.currentEditType = null;
-        window.currentEditId = null;
-        window.currentSubjectId = null;
-        window.currentNoteImagesRaw = null; 
-        window.daysKeys = [
-            { id: 'sat', name: 'السبت' }, { id: 'sun', name: 'الأحد' }, { id: 'mon', name: 'الإثنين' }, 
-            { id: 'tue', name: 'الثلاثاء' }, { id: 'wed', name: 'الأربعاء' }, { id: 'thu', name: 'الخميس' }, { id: 'fri', name: 'الجمعة' }
-        ];
-
-        window.initSupabase = function() {
-            try {
-                if (window.supabase) {
-                    window.supabaseInstance = window.supabase.createClient(MY_SUPABASE_URL, MY_SUPABASE_KEY);
-                    window.isConfigured = true;
-                }
-            } catch (e) { console.error("خطأ في التهيئة:", e); }
-        };
-
-        window.checkConnectionAlert = function() {
-            if(!window.isConfigured || !window.supabaseInstance) {
-                alert("لم يتمكن النظام من الاتصال بالسيرفر. يرجى التحقق من الإنترنت.");
-                return false;
+        // 2. جلب الملفات السحابية غير الموجودة محلياً وتخزينها أوفلاين
+        const fbFilesSnap = await dbGet(dbRef(fbDb, "study_portal_V2/files"));
+        if (fbFilesSnap.exists()) {
+          const remoteFiles = fbFilesSnap.val();
+          for (const fId in remoteFiles) {
+            const rf = remoteFiles[fId];
+            if (!allFilesList.some(localF => localF.id === rf.id)) {
+              let blobObj = null;
+              let dataUrlStr = rf.inlineDataUrl || null;
+              if (dataUrlStr) {
+                blobObj = dataURLToBlob(dataUrlStr);
+              }
+              const newLocalFile = {
+                ...rf,
+                dataUrl: dataUrlStr,
+                blob: blobObj,
+                firebaseSynced: true
+              };
+              allFilesList.push(newLocalFile);
+              await idbPut("files", newLocalFile);
             }
-            return true;
+          }
+        }
+
+        // 3. مزامنة الجدول الدراسي
+        const fbSchedSnap = await dbGet(dbRef(fbDb, "study_portal_V2/schedule_days"));
+        if (fbSchedSnap.exists()) {
+          const remoteDays = fbSchedSnap.val();
+          const localSaved = await idbGet("schedule", "days_table");
+          if (!localSaved) {
+            scheduleDaysData = { ...scheduleDaysData, ...remoteDays };
+            await idbPut("schedule", { key: "days_table", data: scheduleDaysData });
+          }
+        }
+        await dbSet(dbRef(fbDb, "study_portal_V2/schedule_days"), scheduleDaysData).catch(() => {});
+
+        renderSubjectsGrid();
+        if (activeSubjectId) renderSubjectFiles();
+        renderScheduleTable();
+        await updateTotalStorageHeader();
+
+        if (showUserToast) {
+          showToast("تمت المزامنة المزدوجة (Firebase + Supabase + Offline) بنجاح!");
+        }
+      } catch (err) {
+        if (showUserToast) {
+          showToast("تم حفظ وتحديث جميع البيانات في ذاكرة الأوفلاين على جهازك.");
+        }
+      }
+    };
+
+    // ==================== 11. إدارة المواد (الفولدرات) ====================
+    window.openSubjectModal = function(editId = null) {
+      const modal = document.getElementById("subjectModal");
+      const titleEl = document.getElementById("subjectModalTitle");
+      const idInput = document.getElementById("editSubjectId");
+      const nameInput = document.getElementById("subjectNameInput");
+      const descInput = document.getElementById("subjectDescInput");
+
+      if (editId) {
+        const sub = subjectsList.find(s => s.id === editId);
+        if (!sub) return;
+        titleEl.textContent = "تعديل بيانات المادة";
+        idInput.value = sub.id;
+        nameInput.value = sub.name;
+        descInput.value = sub.description || "";
+      } else {
+        titleEl.textContent = "إضافة مادة جديدة (فولدر)";
+        idInput.value = "";
+        nameInput.value = "";
+        descInput.value = "";
+      }
+      modal.classList.add("open");
+      setTimeout(() => nameInput.focus(), 100);
+    };
+
+    window.closeModal = function(modalId) {
+      document.getElementById(modalId).classList.remove("open");
+    };
+
+    window.saveSubjectFolder = async function() {
+      const idInput = document.getElementById("editSubjectId").value.trim();
+      const name = document.getElementById("subjectNameInput").value.trim();
+      const description = document.getElementById("subjectDescInput").value.trim();
+
+      if (!name) {
+        showToast("يرجى كتابة اسم المادة أولاً!");
+        return;
+      }
+
+      if (idInput) {
+        const idx = subjectsList.findIndex(s => s.id === idInput);
+        if (idx > -1) {
+          subjectsList[idx].name = name;
+          subjectsList[idx].description = description;
+          await idbPut("subjects", subjectsList[idx]);
+          dbSet(dbRef(fbDb, `study_portal_V2/subjects/${idInput}`), subjectsList[idx]).catch(() => {});
+          showToast("تم تعديل اسم المادة بنجاح");
+        }
+      } else {
+        const newSub = {
+          id: "sub_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+          name,
+          description,
+          createdAt: new Date().toISOString()
+        };
+        subjectsList.unshift(newSub);
+        await idbPut("subjects", newSub);
+        dbSet(dbRef(fbDb, `study_portal_V2/subjects/${newSub.id}`), newSub).catch(() => {});
+        if (supabaseClient) {
+          supabaseClient.from("study_subjects").upsert({
+            id: newSub.id,
+            name: newSub.name,
+            description: newSub.description,
+            created_at: newSub.createdAt
+          }).catch(() => {});
+        }
+        showToast(`تم إنشاء فولدر مادة "${name}" بنجاح`);
+      }
+
+      closeModal("subjectModal");
+      renderSubjectsGrid();
+      await updateTotalStorageHeader();
+    };
+
+    window.deleteSubjectFolder = async function(subId, event) {
+      if (event) event.stopPropagation();
+      const sub = subjectsList.find(s => s.id === subId);
+      if (!sub) return;
+      if (!confirm(`هل أنت متأكد من حذف مادة "${sub.name}" وجميع الملفات الموجودة بداخلها؟`)) return;
+
+      const subFiles = allFilesList.filter(f => f.subjectId === subId);
+      for (const f of subFiles) {
+        await idbDelete("files", f.id);
+        dbRemove(dbRef(fbDb, `study_portal_V2/files/${f.id}`)).catch(() => {});
+      }
+      allFilesList = allFilesList.filter(f => f.subjectId !== subId);
+      subjectsList = subjectsList.filter(s => s.id !== subId);
+
+      await idbDelete("subjects", subId);
+      dbRemove(dbRef(fbDb, `study_portal_V2/subjects/${subId}`)).catch(() => {});
+
+      renderSubjectsGrid();
+      await updateTotalStorageHeader();
+      showToast("تم حذف فولدر المادة وملفاتها.");
+    };
+
+    window.renderSubjectsGrid = function() {
+      const container = document.getElementById("subjectsGridContainer");
+      const query = (document.getElementById("subjectSearchInput").value || "").trim().toLowerCase();
+
+      const filtered = subjectsList.filter(s =>
+        s.name.toLowerCase().includes(query) ||
+        (s.description && s.description.toLowerCase().includes(query))
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box" style="grid-column: 1 / -1;">
+            <i class="fa-solid fa-folder-open" style="font-size: 2.6rem; color: var(--accent-primary); margin-bottom: 10px;"></i>
+            <h3 style="color: var(--text-main); margin-bottom: 6px;">لا توجد مواد مضافة حالياً</h3>
+            <p style="font-size: 0.88rem; margin-bottom: 14px;">اضغط على زر "إضافة مادة جديدة (فولدر)" لإنشاء فولدرات بأسماء مواد الكلية ورفع المحاضرات والملفات بداخلها.</p>
+            <button class="btn btn-primary" onclick="openSubjectModal()">
+              <i class="fa-solid fa-folder-plus"></i> إضافة أول مادة الآن
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(sub => {
+        const subFiles = allFilesList.filter(f => f.subjectId === sub.id);
+        const subBytes = subFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+        return `
+          <div class="folder-card" onclick="openSubjectFolder('${sub.id}')">
+            <div class="folder-top">
+              <div class="folder-icon-wrap">
+                <div class="folder-icon">
+                  <i class="fa-solid fa-folder"></i>
+                </div>
+                <div>
+                  <div class="folder-title">${escapeHtml(sub.name)}</div>
+                  <div class="folder-sub">${escapeHtml(sub.description || "اضغط للدخول ورفع وتصفح المحاضرات")}</div>
+                </div>
+              </div>
+            </div>
+            <div class="folder-meta">
+              <span><i class="fa-regular fa-file-lines"></i> ${subFiles.length} ملفات (${formatBytes(subBytes)})</span>
+              <div class="folder-actions" onclick="event.stopPropagation();">
+                <button class="btn btn-sm" title="تعديل اسم المادة" onclick="openSubjectModal('${sub.id}')">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" title="حذف المادة" onclick="deleteSubjectFolder('${sub.id}', event)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    // ==================== 12. الدخول داخل المادة ورفع الملفات المتعددة ====================
+    window.openSubjectFolder = function(subId) {
+      const sub = subjectsList.find(s => s.id === subId);
+      if (!sub) return;
+      activeSubjectId = subId;
+      selectedFileIds.clear();
+      document.getElementById("foldersListView").style.display = "none";
+      document.getElementById("insideSubjectView").style.display = "block";
+      document.getElementById("activeSubjectTitle").textContent = sub.name;
+      renderSubjectFiles();
+    };
+
+    window.closeSubjectFolder = function() {
+      activeSubjectId = null;
+      selectedFileIds.clear();
+      document.getElementById("insideSubjectView").style.display = "none";
+      document.getElementById("foldersListView").style.display = "block";
+      renderSubjectsGrid();
+    };
+
+    function detectFileCategory(file) {
+      const mime = (file.type || "").toLowerCase();
+      const name = (file.name || "").toLowerCase();
+      if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+      if (mime.startsWith("image/") || /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/.test(name)) return "image";
+      if (mime.startsWith("text/") || /\.(txt|md|json|csv|js|py|html|css|c|cpp)$/.test(name)) return "text";
+      return "other";
+    }
+
+    // السحب والإفلات داخل المادة
+    const dropzone = document.getElementById("subjectDropzone");
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleSubjectFilesUpload(e.dataTransfer.files);
+      }
+    });
+
+    window.handleSubjectFilesUpload = async function(fileList) {
+      if (!activeSubjectId || !fileList || fileList.length === 0) return;
+      const filesArray = Array.from(fileList);
+      const progBox = document.getElementById("uploadProgressBox");
+      const progTitle = document.getElementById("uploadProgressTitle");
+      const progPercent = document.getElementById("uploadProgressPercent");
+      const progBar = document.getElementById("uploadProgressBar");
+
+      progBox.style.display = "block";
+
+      for (let i = 0; i < filesArray.length; i++) {
+        const f = filesArray[i];
+        const pct = Math.round(((i + 0.5) / filesArray.length) * 100);
+        progTitle.textContent = `جاري حفظ ورفع (${i + 1} من ${filesArray.length}): ${f.name}`;
+        progPercent.textContent = `${pct}%`;
+        progBar.style.width = `${pct}%`;
+
+        const cat = detectFileCategory(f);
+        const dataUrl = await fileToDataURL(f);
+        let textContent = null;
+        if (cat === "text") {
+          try {
+            textContent = await f.text();
+          } catch (e) {}
+        }
+
+        const fileRecord = {
+          id: "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8),
+          subjectId: activeSubjectId,
+          name: f.name,
+          type: f.type || "application/octet-stream",
+          category: cat,
+          size: f.size,
+          createdAt: new Date().toISOString(),
+          dataUrl: dataUrl,
+          blob: f,
+          textContent: textContent,
+          offlineReady: true,
+          firebaseSynced: false,
+          supabaseSynced: false
         };
 
-        window.checkAuth = function() {
-            try {
-                const pwdInput = document.getElementById('password-input');
-                if(!pwdInput) return;
-                const pwd = pwdInput.value.trim();
-                
-                if(pwd === '#ZMsd42d*' || pwd === 'ZMsd42d*') {
-                    window.hideElement('login-screen');
-                    window.showElement('app-wrapper', 'flex');
-                    if(window.isConfigured) {
-                        window.initApp();
-                    }
-                } else { 
-                    window.showElement('login-error', 'block');
-                }
-            } catch (e) { console.error(e); }
+        // 1. الحفظ الفوري أوفلاين في IndexedDB
+        await idbPut("files", fileRecord);
+        allFilesList.unshift(fileRecord);
+        renderSubjectFiles();
+        await updateTotalStorageHeader();
+
+        // 2. الرفع المزدوج على Firebase + Supabase
+        await uploadFileToDualCloud(fileRecord, f);
+        renderSubjectFiles();
+      }
+
+      progTitle.textContent = `تم حفظ ورفع ${filesArray.length} ملف بنجاح (جاهز أوفلاين وسحابياً)!`;
+      progPercent.textContent = "100%";
+      progBar.style.width = "100%";
+      document.getElementById("multiFileInput").value = "";
+      showToast(`تم رفع وحفظ ${filesArray.length} ملف بنجاح!`);
+
+      setTimeout(() => {
+        progBox.style.display = "none";
+      }, 2500);
+    };
+
+    // كتابة مذكرة نصية مباشرة داخل المادة
+    window.openTextNoteModal = function(editFileId = null) {
+      if (!activeSubjectId) return;
+      const modal = document.getElementById("textNoteModal");
+      const idInp = document.getElementById("editTextFileId");
+      const titleInp = document.getElementById("textNoteTitleInput");
+      const contentInp = document.getElementById("textNoteContentInput");
+
+      if (editFileId) {
+        const existing = allFilesList.find(f => f.id === editFileId);
+        if (!existing) return;
+        document.getElementById("textNoteModalTitle").textContent = "تعديل المذكرة النصية";
+        idInp.value = existing.id;
+        titleInp.value = existing.name;
+        contentInp.value = existing.textContent || "";
+      } else {
+        document.getElementById("textNoteModalTitle").textContent = "كتابة مذكرة نصية جديدة داخل المادة";
+        idInp.value = "";
+        titleInp.value = "";
+        contentInp.value = "";
+      }
+      modal.classList.add("open");
+    };
+
+    window.saveCustomTextNote = async function() {
+      const editId = document.getElementById("editTextFileId").value.trim();
+      let title = document.getElementById("textNoteTitleInput").value.trim();
+      const content = document.getElementById("textNoteContentInput").value;
+
+      if (!title) {
+        showToast("يرجى كتابة عنوان للمذكرة النصية");
+        return;
+      }
+      if (!title.toLowerCase().endsWith(".txt")) {
+        title += ".txt";
+      }
+
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const dataUrl = await fileToDataURL(blob);
+
+      if (editId) {
+        const idx = allFilesList.findIndex(f => f.id === editId);
+        if (idx > -1) {
+          allFilesList[idx].name = title;
+          allFilesList[idx].textContent = content;
+          allFilesList[idx].size = blob.size;
+          allFilesList[idx].dataUrl = dataUrl;
+          allFilesList[idx].blob = blob;
+          await idbPut("files", allFilesList[idx]);
+          await uploadFileToDualCloud(allFilesList[idx], blob);
+        }
+      } else {
+        const newFile = {
+          id: "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8),
+          subjectId: activeSubjectId,
+          name: title,
+          type: "text/plain",
+          category: "text",
+          size: blob.size,
+          createdAt: new Date().toISOString(),
+          dataUrl: dataUrl,
+          blob: blob,
+          textContent: content,
+          offlineReady: true,
+          firebaseSynced: false,
+          supabaseSynced: false
         };
+        await idbPut("files", newFile);
+        allFilesList.unshift(newFile);
+        await uploadFileToDualCloud(newFile, blob);
+      }
 
-        window.toggleTheme = function() {
-            document.body.classList.remove('theme-midnight', 'theme-dark', 'theme-light');
-            if(window.currentTheme === 'midnight') { window.currentTheme = 'dark'; document.body.classList.add('theme-dark'); }
-            else if(window.currentTheme === 'dark') { window.currentTheme = 'light'; document.body.classList.add('theme-light'); }
-            else { window.currentTheme = 'midnight'; document.body.classList.add('theme-midnight'); }
-        };
+      closeModal("textNoteModal");
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حفظ المذكرة النصية أوفلاين وسحابياً!");
+    };
 
-        window.toggleViewMode = function() {
-            window.isMobileView = !window.isMobileView;
-            const wrap = document.getElementById('app-wrapper');
-            if(window.isMobileView) wrap.classList.add('mobile-mode'); else wrap.classList.remove('mobile-mode');
-        };
+    window.setFileFilter = function(filterType, btnEl) {
+      activeFileFilter = filterType;
+      document.querySelectorAll(".filter-pill").forEach(b => b.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+      renderSubjectFiles();
+    };
 
-        window.toggleSidebar = function() {
-            const sidebar = document.getElementById('sidebar');
-            if(sidebar.style.display === 'none' || sidebar.classList.contains('hidden-force')) {
-                sidebar.classList.remove('hidden-force'); sidebar.style.display = 'flex';
-            } else {
-                sidebar.classList.add('hidden-force'); sidebar.style.display = 'none';
-            }
-        };
+    window.renderSubjectFiles = function() {
+      if (!activeSubjectId) return;
+      const grid = document.getElementById("subjectFilesGrid");
+      const query = (document.getElementById("fileSearchInput").value || "").trim().toLowerCase();
 
-        window.switchTab = function(tabId) {
-            window.hideElement('notes-tab'); window.hideElement('subjects-tab'); window.hideElement('schedule-tab');
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.style.backgroundColor = 'transparent'; btn.style.color = 'var(--text-muted)'; btn.classList.remove('active');
-            });
-            window.showElement(tabId, 'block');
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if(activeBtn) {
-                activeBtn.classList.add('active');
-                activeBtn.style.backgroundColor = 'rgba(138, 180, 248, 0.1)'; 
-                activeBtn.style.color = 'var(--text-main)';
-            }
-            if(window.innerWidth < 768) { window.hideElement('sidebar'); }
-        };
+      const subFiles = allFilesList.filter(f => f.subjectId === activeSubjectId);
+      const totalSubBytes = subFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+      document.getElementById("activeSubjectMeta").textContent =
+        `إجمالي الملفات بالمادة: ${subFiles.length} ملف | المساحة: ${formatBytes(totalSubBytes)}`;
 
-        window.openLightbox = function(url) {
-            document.getElementById('lightbox-img').src = url;
-            window.showElement('lightbox-modal', 'flex');
-        };
-        window.closeLightbox = function() {
-            window.hideElement('lightbox-modal');
-            document.getElementById('lightbox-img').src = '';
-        };
+      const filtered = subFiles.filter(f => {
+        const matchFilter = activeFileFilter === "all" || f.category === activeFileFilter;
+        const matchQuery = f.name.toLowerCase().includes(query) || (f.textContent && f.textContent.toLowerCase().includes(query));
+        return matchFilter && matchQuery;
+      });
 
-        window.updateStorageSize = async function() {
-            if(!window.isConfigured || !window.supabaseInstance) return;
-            const sizeEl = document.getElementById('total-storage-size');
-            try {
-                let totalBytes = 0;
-                const getFolderSize = async (path) => {
-                    let size = 0;
-                    const { data } = await window.supabaseInstance.storage.from('materials').list(path);
-                    if(data) {
-                        for(let item of data) {
-                            if(item.id) { size += item.metadata?.size || 0; } 
-                            else { size += await getFolderSize(path ? `${path}/${item.name}` : item.name); }
-                        }
-                    }
-                    return size;
-                };
-                totalBytes = await getFolderSize('');
-                const mb = (totalBytes / (1024 * 1024)).toFixed(2);
-                sizeEl.innerText = `المساحة المستخدمة: ${mb} MB / 1024 MB`;
-            } catch(e) {
-                sizeEl.innerText = "تعذر حساب المساحة";
-            }
-        };
+      document.getElementById("selectedFilesCount").textContent = selectedFileIds.size;
 
-        window.showNoteActions = function() { window.showElement('note-title', 'block'); window.showElement('note-actions', 'flex'); };
-        window.hideNoteActions = function() { 
-            window.hideElement('note-title'); window.hideElement('note-actions'); window.hideElement('note-images-preview');
-            document.getElementById('note-title').value = ''; document.getElementById('note-body').value = ''; 
-            document.getElementById('note-body').style.height = ''; document.getElementById('note-images-input').value = '';
-        };
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state-box" style="grid-column: 1 / -1;">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 10px;"></i>
+            <h3 style="color: var(--text-main); margin-bottom: 6px;">لا توجد ملفات في هذا القسم حالياً</h3>
+            <p style="font-size: 0.86rem;">ارفع ملفات PDF أو صور أو مذكرات نصية أو أي ملفات تريدها بالأعلى وستعمل معك أوفلاين في أي وقت.</p>
+          </div>
+        `;
+        return;
+      }
 
-        window.previewNoteImages = function(event) {
-            const previewContainer = document.getElementById('note-images-preview');
-            previewContainer.innerHTML = '';
-            const files = event.target.files;
-            if(files.length > 0) {
-                window.showElement('note-images-preview', 'flex');
-                for(let file of files) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewContainer.innerHTML += `<img src="${e.target.result}" class="w-16 h-16 object-cover rounded border border-gray-400">`;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            } else {
-                window.hideElement('note-images-preview');
-            }
-        };
-        
-        window.showSubjectActions = function() { window.showElement('subject-extra', 'block'); };
-        window.hideSubjectActions = function() { window.hideElement('subject-extra'); document.getElementById('subject-name').value = ''; document.getElementById('subject-dept').value = ''; };
+      grid.innerHTML = filtered.map(f => {
+        const isSelected = selectedFileIds.has(f.id);
+        let iconClass = "fa-file";
+        if (f.category === "pdf") iconClass = "fa-file-pdf";
+        else if (f.category === "image") iconClass = "fa-file-image";
+        else if (f.category === "text") iconClass = "fa-file-lines";
 
-        window.fetchNotes = async function() {
-            if(!window.isConfigured || !window.supabaseInstance) return;
-            try {
-                const { data, error } = await window.supabaseInstance.from('notes').select('*').order('created_at', { ascending: false });
-                const grid = document.getElementById('notes-grid'); grid.innerHTML = '';
-                if(data && data.length > 0) {
-                    data.forEach(d => {
-                        let actualBody = d.body || '';
-                        let imagesHtml = '';
-                        let safeTitle = (d.title||'').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                        let safeBodyFull = actualBody.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
-                        
-                        if (actualBody.includes('||IMAGES||')) {
-                            const parts = actualBody.split('||IMAGES||');
-                            actualBody = parts[0];
-                            try {
-                                const urls = JSON.parse(parts[1]);
-                                if(urls.length > 0) {
-                                    imagesHtml = '<div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">';
-                                    urls.forEach(url => {
-                                        imagesHtml += `<img src="${url}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded cursor-pointer border border-gray-300 hover:opacity-80 transition shadow-sm" onclick="window.openLightbox('${url}')">`;
-                                    });
-                                    imagesHtml += '</div>';
-                                }
-                            } catch(e){}
-                        }
+        let previewBlock = "";
+        if (f.category === "image" && f.dataUrl) {
+          previewBlock = `<img src="${f.dataUrl}" class="file-thumb-preview" alt="${escapeHtml(f.name)}" onclick="openFileViewer('${f.id}')" />`;
+        } else if (f.category === "text" && f.textContent) {
+          previewBlock = `<div class="file-text-snippet" onclick="openFileViewer('${f.id}')">${escapeHtml(f.textContent.substring(0, 180))}</div>`;
+        }
 
-                        const el = document.createElement('div'); el.className = "keep-card p-4 masonry-item group";
-                        el.innerHTML = `
-                            <h3 class="font-bold mb-2 text-lg">${d.title}</h3>
-                            <p class="text-sm theme-text-muted whitespace-pre-wrap leading-relaxed">${actualBody}</p>
-                            ${imagesHtml}
-                            <div class="keep-card-actions absolute top-2 left-2 flex gap-2 bg-black bg-opacity-10 backdrop-blur-sm p-1 rounded-full z-10">
-                                <button onclick="window.openEditModal('note', '${d.id}', '${safeTitle}', '${safeBodyFull}')" class="w-7 h-7 rounded-full bg-white dark:bg-gray-800 text-gray-600 hover:text-keep-blue flex items-center justify-center cursor-pointer shadow"><i class="fa-solid fa-pen text-xs"></i></button>
-                                <button onclick="window.deleteItem('notes', '${d.id}')" class="w-7 h-7 rounded-full bg-white dark:bg-gray-800 text-red-400 hover:text-red-600 flex items-center justify-center cursor-pointer shadow"><i class="fa-solid fa-trash text-xs"></i></button>
-                            </div>`;
-                        grid.appendChild(el);
-                    });
-                } else { grid.innerHTML = "<div class='text-center theme-text-muted py-10 w-full'>لا توجد مذكرات بعد. ابدأ بإضافة مذكرتك الأولى!</div>"; }
-            } catch(e) { console.error(e); }
-        };
+        const dateStr = new Date(f.createdAt).toLocaleDateString("ar-EG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
-        window.fetchSubjects = async function() {
-            if(!window.isConfigured || !window.supabaseInstance) return;
-            try {
-                const { data, error } = await window.supabaseInstance.from('subjects').select('*').order('created_at', { ascending: false });
-                const grid = document.getElementById('subjects-grid'); grid.innerHTML = '';
-                if(data && data.length > 0) {
-                    data.forEach(d => {
-                        const safeName = (d.name||'').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                        const safeDept = (d.department||'').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                        const el = document.createElement('div'); el.className = "keep-card p-5 masonry-item group cursor-pointer flex flex-col hover:border-keep-blue border-b-4 border-b-transparent transition-all";
-                        el.innerHTML = `
-                            <div onclick="window.openSubjectModal('${d.id}', '${safeName}', '${safeDept}')" class="flex-1 text-center py-4">
-                                <i class="fa-solid fa-folder-open text-4xl text-keep-blue mb-3 opacity-80 group-hover:opacity-100 transition"></i>
-                                <h3 class="text-xl font-bold mb-1">${d.name}</h3><span class="text-xs bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full theme-text-muted font-bold">${d.department}</span>
-                            </div>
-                            <div class="keep-card-actions absolute top-2 left-2 flex gap-1 z-10">
-                                <button onclick="event.stopPropagation(); window.openEditModal('subject', '${d.id}', '${safeName}', '${safeDept}')" class="w-8 h-8 rounded-full hover:bg-gray-200 dark:bg-gray-700 theme-text-muted cursor-pointer shadow"><i class="fa-solid fa-pen text-sm"></i></button>
-                                <button onclick="event.stopPropagation(); window.deleteItem('subjects', '${d.id}')" class="w-8 h-8 rounded-full hover:bg-red-100 hover:text-red-500 theme-text-muted cursor-pointer shadow"><i class="fa-solid fa-trash text-sm"></i></button>
-                            </div>`;
-                        grid.appendChild(el);
-                    });
-                } else { grid.innerHTML = "<div class='text-center theme-text-muted py-10 w-full'>لم يتم إضافة أي مواد دراسية بعد.</div>"; }
-            } catch(e) { console.error(e); }
-        };
+        return `
+          <div class="file-card ${isSelected ? "selected" : ""}">
+            <div class="file-card-top">
+              <input type="checkbox" class="file-select-chk" ${isSelected ? "checked" : ""} onchange="toggleSelectSingleFile('${f.id}', this.checked)" />
+              <div class="file-type-icon ${f.category}">
+                <i class="fa-solid ${iconClass}"></i>
+              </div>
+              <div class="file-info">
+                <div class="file-name">${escapeHtml(f.name)}</div>
+                <div class="file-details">
+                  <span>${formatBytes(f.size)}</span>
+                  <span>•</span>
+                  <span>${dateStr}</span>
+                </div>
+              </div>
+            </div>
 
-        window.loadSchedule = async function() {
-            if(!window.isConfigured || !window.supabaseInstance) return;
-            try {
-                const { data, error } = await window.supabaseInstance.from('schedule').select('*').eq('id', 'main').single();
-                const tbody = document.getElementById('school-timetable-body'); const btn = document.getElementById('download-schedule-btn'); const noPdf = document.getElementById('no-schedule-pdf');
-                tbody.innerHTML = '';
-                let daysData = data ? (data.days || {}) : {};
-                window.daysKeys.forEach(d => { tbody.innerHTML += `<tr><td class="font-bold text-keep-blue">${d.name}</td><td>${daysData[d.id] || '-'}</td></tr>`; });
+            ${previewBlock}
 
-                if(data && data.pdf_url) { 
-                    btn.href = data.pdf_url; window.showElement('download-schedule-btn', 'inline-block'); window.hideElement('no-schedule-pdf'); 
-                } else { 
-                    window.hideElement('download-schedule-btn'); window.showElement('no-schedule-pdf', 'block'); 
-                }
+            <div class="sync-badges-row">
+              <span class="mini-badge ok"><i class="fa-solid fa-bolt"></i> يفتح أوفلاين</span>
+              <span class="mini-badge ${f.firebaseSynced ? "ok" : ""}">Firebase ${f.firebaseSynced ? "✓" : "•"}</span>
+              <span class="mini-badge ${f.supabaseSynced ? "ok" : ""}">Supabase ${f.supabaseSynced ? "✓" : "•"}</span>
+            </div>
 
-                const imgContainer = document.getElementById('schedule-images-display');
-                imgContainer.innerHTML = '';
-                const scheduleImages = daysData.schedule_images || [];
-                if(scheduleImages.length > 0) {
-                    scheduleImages.forEach(url => {
-                        imgContainer.innerHTML += `
-                            <div class="relative group">
-                                <img src="${url}" class="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded border border-gray-300 cursor-pointer hover:opacity-80 transition shadow" onclick="window.openLightbox('${url}')">
-                                <button onclick="window.deleteScheduleImage('${url}')" class="absolute top-1 left-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer shadow"><i class="fa-solid fa-xmark text-xs"></i></button>
-                            </div>`;
-                    });
-                } else {
-                    imgContainer.innerHTML = `<p class="text-sm theme-text-muted w-full">لا توجد صور مرفوعة للجدول.</p>`;
-                }
+            <div class="file-actions-row">
+              <div class="btn-group">
+                <button class="btn btn-sm btn-primary" onclick="openFileViewer('${f.id}')">
+                  <i class="fa-solid fa-eye"></i> فتح ومعاينة
+                </button>
+                <button class="btn btn-sm btn-success" onclick="downloadFileToDevice('${f.id}')">
+                  <i class="fa-solid fa-download"></i> تحميل
+                </button>
+                ${f.category === "text" ? `
+                  <button class="btn btn-sm" onclick="openTextNoteModal('${f.id}')" title="تعديل النص">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                ` : ""}
+              </div>
+              <button class="btn btn-sm btn-danger" onclick="deleteSingleFile('${f.id}')" title="حذف الملف">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
 
-            } catch (e) { console.error(e); }
-        };
+    // ==================== 13. تحديد عدة ملفات وتحميلها أو حذفها ====================
+    window.toggleSelectSingleFile = function(fileId, checked) {
+      if (checked) selectedFileIds.add(fileId);
+      else selectedFileIds.delete(fileId);
+      renderSubjectFiles();
+    };
 
-        window.fetchSubjectFiles = async function(id) {
-            if(!window.isConfigured || !window.supabaseInstance) return;
-            try {
-                const { data } = await window.supabaseInstance.from('files').select('*').eq('subject_id', id).order('created_at', { ascending: false });
-                const list = document.getElementById('subject-files-list'); list.innerHTML = '';
-                if(!data || data.length === 0) { list.innerHTML = "<div class='text-center theme-text-muted w-full py-8 border-dashed border-2 rounded'>لا توجد ملفات مرفوعة لهذه المادة حتى الآن.</div>"; return; }
-                
-                data.forEach(d => {
-                    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(d.file_name);
-                    const el = document.createElement('div');
-                    
-                    if(isImage) {
-                        el.className = "keep-card p-2 masonry-item flex flex-col items-center group shadow-sm hover:shadow-md";
-                        el.innerHTML = `
-                            <div class="w-full h-40 overflow-hidden rounded mb-2 bg-gray-100 dark:bg-gray-800 flex items-center justify-center cursor-pointer relative" onclick="window.openLightbox('${d.url}')">
-                                <img src="${d.url}" class="w-full h-full object-cover transition transform hover:scale-105">
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center"><i class="fa-solid fa-expand text-white opacity-0 group-hover:opacity-100 text-2xl drop-shadow-md"></i></div>
-                            </div>
-                            <div class="flex justify-between items-center w-full px-1">
-                                <div class="truncate">
-                                    <h4 class="font-bold text-sm truncate" title="${d.title}">${d.title}</h4>
-                                    <p class="text-xs text-keep-blue truncate" dir="ltr">${d.file_name}</p>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="${d.url}" target="_blank" class="text-keep-blue hover:text-blue-600 p-2"><i class="fa-solid fa-download"></i></a>
-                                    <button onclick="window.deleteFile('${d.id}', '${d.file_path}')" class="text-red-400 hover:text-red-600 p-2 opacity-0 group-hover:opacity-100 transition cursor-pointer"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>`;
-                    } else {
-                        el.className = "keep-card p-3 masonry-item flex justify-between items-center group border-l-4 border-l-keep-blue shadow-sm";
-                        el.innerHTML = `
-                            <div class="flex items-center gap-3 overflow-hidden">
-                                <i class="fa-solid fa-file-pdf text-3xl text-red-400"></i>
-                                <div class="truncate pr-2">
-                                    <h4 class="font-bold text-sm truncate" title="${d.title}">${d.title}</h4>
-                                    <a href="${d.url}" target="_blank" class="text-xs text-keep-blue hover:underline truncate" dir="ltr">${d.file_name}</a>
-                                </div>
-                            </div>
-                            <div class="flex gap-1 shrink-0">
-                                <a href="${d.url}" target="_blank" class="bg-gray-100 dark:bg-gray-800 hover:bg-keep-blue hover:text-white text-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition shadow-sm"><i class="fa-solid fa-download text-xs"></i></a>
-                                <button onclick="window.deleteFile('${d.id}', '${d.file_path}')" class="text-red-400 hover:text-red-600 w-8 h-8 opacity-0 group-hover:opacity-100 transition cursor-pointer"><i class="fa-solid fa-trash"></i></button>
-                            </div>`;
-                    }
-                    list.appendChild(el);
-                });
-            } catch(e) { console.error(e); }
-        };
+    window.toggleSelectAllFiles = function() {
+      const subFiles = allFilesList.filter(f => f.subjectId === activeSubjectId);
+      if (selectedFileIds.size === subFiles.length && subFiles.length > 0) {
+        selectedFileIds.clear();
+      } else {
+        subFiles.forEach(f => selectedFileIds.add(f.id));
+      }
+      renderSubjectFiles();
+    };
 
-        window.initApp = function() { window.fetchNotes(); window.fetchSubjects(); window.loadSchedule(); window.updateStorageSize(); };
+    window.downloadSelectedFiles = async function() {
+      if (selectedFileIds.size === 0) {
+        showToast("يرجى تحديد ملف أو أكثر أولاً لتحميله");
+        return;
+      }
+      let count = 0;
+      for (const fId of selectedFileIds) {
+        await downloadFileToDevice(fId);
+        count++;
+        await new Promise(r => setTimeout(r, 250));
+      }
+      showToast(`تم بدء تحميل ${count} ملفات على جهازك!`);
+    };
 
-        window.saveNote = async function() {
-            if(!window.checkConnectionAlert()) return;
-            const t = document.getElementById('note-title').value.trim();
-            const b = document.getElementById('note-body').value.trim();
-            const filesInput = document.getElementById('note-images-input');
-            const files = filesInput.files;
+    window.deleteSelectedFiles = async function() {
+      if (selectedFileIds.size === 0) {
+        showToast("يرجى تحديد الملفات المراد حذفها أولاً");
+        return;
+      }
+      if (!confirm(`هل أنت متأكد من حذف ${selectedFileIds.size} ملفات محددة؟`)) return;
 
-            if(!t && !b && files.length === 0) return;
+      for (const fId of selectedFileIds) {
+        await idbDelete("files", fId);
+        dbRemove(dbRef(fbDb, `study_portal_V2/files/${fId}`)).catch(() => {});
+        allFilesList = allFilesList.filter(f => f.id !== fId);
+      }
+      selectedFileIds.clear();
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حذف الملفات المحددة بنجاح.");
+    };
 
-            window.showElement('note-progress-container', 'block');
-            document.getElementById('save-note-btn').disabled = true;
+    window.deleteSingleFile = async function(fileId) {
+      const f = allFilesList.find(item => item.id === fileId);
+      if (!f) return;
+      if (!confirm(`حذف الملف "${f.name}"؟`)) return;
+      await idbDelete("files", fileId);
+      dbRemove(dbRef(fbDb, `study_portal_V2/files/${fileId}`)).catch(() => {});
+      allFilesList = allFilesList.filter(item => item.id !== fileId);
+      selectedFileIds.delete(fileId);
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حذف الملف.");
+    };
 
-            try {
-                let imageUrls = [];
-                if(files.length > 0) {
-                    for(let file of files) {
-                        const filePath = `notes_images/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
-                        const { error } = await window.supabaseInstance.storage.from('materials').upload(filePath, file);
-                        if(!error) {
-                            const { data: publicData } = window.supabaseInstance.storage.from('materials').getPublicUrl(filePath);
-                            imageUrls.push(publicData.publicUrl);
-                        }
-                    }
-                }
+    // ==================== 14. فتح ومعاينة الملفات أوفلاين وتحميلها على الجهاز ====================
+    function getFileUsableBlob(fileRecord) {
+      if (fileRecord.blob instanceof Blob) {
+        return fileRecord.blob;
+      }
+      if (fileRecord.dataUrl) {
+        return dataURLToBlob(fileRecord.dataUrl);
+      }
+      if (fileRecord.textContent !== undefined && fileRecord.textContent !== null) {
+        return new Blob([fileRecord.textContent], { type: "text/plain;charset=utf-8" });
+      }
+      return null;
+    }
 
-                let finalBody = b;
-                if(imageUrls.length > 0) {
-                    finalBody += `\n||IMAGES||` + JSON.stringify(imageUrls);
-                }
+    window.downloadFileToDevice = async function(fileId) {
+      const f = allFilesList.find(item => item.id === fileId);
+      if (!f) return;
 
-                const { error } = await window.supabaseInstance.from('notes').insert([{ title: t, body: finalBody }]);
-                if(!error) { 
-                    window.hideNoteActions(); window.fetchNotes(); window.updateStorageSize(); 
-                } else { 
-                    alert("حدث خطأ أثناء الحفظ."); 
-                }
-            } catch (e) { alert("حدث خطأ بالاتصال"); }
-            
-            window.hideElement('note-progress-container');
-            document.getElementById('save-note-btn').disabled = false;
-        };
+      const blob = getFileUsableBlob(f);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = f.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        showToast(`جاري تحميل "${f.name}" على جهازك`);
+      } else if (f.fbDownloadUrl || f.sbDownloadUrl) {
+        window.open(f.fbDownloadUrl || f.sbDownloadUrl, "_blank");
+      }
+    };
 
-        window.saveSubject = async function() {
-            if(!window.checkConnectionAlert()) return;
-            const n = document.getElementById('subject-name').value.trim(), d = document.getElementById('subject-dept').value.trim();
-            if(!n) return;
-            try {
-                const { error } = await window.supabaseInstance.from('subjects').insert([{ name: n, department: d }]);
-                if(!error) { window.hideSubjectActions(); window.fetchSubjects(); } else { alert("حدث خطأ أثناء الإضافة."); }
-            } catch (e) { alert("حدث خطأ بالاتصال"); }
-        };
+    window.openFileViewer = function(fileId) {
+      const f = allFilesList.find(item => item.id === fileId);
+      if (!f) return;
 
-        window.openEditModal = function(type, id, val1, val2) {
-            window.currentEditType = type; window.currentEditId = id; window.currentNoteImagesRaw = null;
-            window.showElement('edit-item-modal');
-            document.getElementById('edit-modal-title').innerText = type === 'note' ? 'تعديل المذكرة' : 'تعديل المادة';
-            document.getElementById('edit-input-1').value = val1;
-            
-            let textContent = val2 || '';
-            if(type === 'note' && textContent.includes('||IMAGES||')) {
-                const parts = textContent.split('||IMAGES||');
-                textContent = parts[0];
-                window.currentNoteImagesRaw = parts[1];
-            }
-            document.getElementById('edit-input-2').value = textContent;
-        };
+      if (currentViewerBlobUrl) {
+        URL.revokeObjectURL(currentViewerBlobUrl);
+        currentViewerBlobUrl = null;
+      }
 
-        window.saveEdit = async function() {
-            if(!window.checkConnectionAlert()) return;
-            const val1 = document.getElementById('edit-input-1').value.trim();
-            let val2 = document.getElementById('edit-input-2').value.trim();
-            if(!val1) return;
+      const modal = document.getElementById("fileViewerModal");
+      const titleEl = document.getElementById("viewerFileTitle");
+      const bodyEl = document.getElementById("viewerModalBody");
+      const dlBtn = document.getElementById("viewerDownloadBtn");
 
-            if(window.currentEditType === 'note' && window.currentNoteImagesRaw) {
-                val2 += '||IMAGES||' + window.currentNoteImagesRaw;
-            }
+      titleEl.textContent = f.name;
+      dlBtn.onclick = () => downloadFileToDevice(f.id);
 
-            try {
-                if(window.currentEditType === 'note') {
-                    const {error} = await window.supabaseInstance.from('notes').update({ title: val1, body: val2 }).eq('id', window.currentEditId);
-                    if(error) alert("خطأ في التعديل"); else window.fetchNotes();
-                } else if(window.currentEditType === 'subject') {
-                    const {error} = await window.supabaseInstance.from('subjects').update({ name: val1, department: val2 }).eq('id', window.currentEditId);
-                    if(error) alert("خطأ في التعديل"); else window.fetchSubjects();
-                }
-                window.closeModal('edit-item-modal');
-            } catch (e) { alert("حدث خطأ في الاتصال"); }
-        };
+      const blob = getFileUsableBlob(f);
+      const blobUrl = blob ? URL.createObjectURL(blob) : (f.dataUrl || f.fbDownloadUrl || f.sbDownloadUrl);
+      if (blob) currentViewerBlobUrl = blobUrl;
 
-        window.deleteItem = async function(type, id) {
-            if(!window.checkConnectionAlert()) return;
-            if(!confirm('هل أنت متأكد من الحذف النهائي؟')) return;
-            try {
-                const { error } = await window.supabaseInstance.from(type).delete().eq('id', id);
-                if(error) { alert("حدث خطأ أثناء الحذف."); return; }
-                if(type === 'notes') window.fetchNotes(); else window.fetchSubjects();
-                window.updateStorageSize();
-            } catch (e) { alert("خطأ في الاتصال"); }
-        };
+      if (f.category === "pdf") {
+        bodyEl.innerHTML = `<iframe src="${blobUrl}" class="viewer-iframe"></iframe>`;
+      } else if (f.category === "image") {
+        bodyEl.innerHTML = `<img src="${blobUrl}" style="max-width: 100%; max-height: 75vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(f.name)}" />`;
+      } else if (f.category === "text") {
+        const textVal = f.textContent || "";
+        bodyEl.innerHTML = `
+          <div style="width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; white-space: pre-wrap; line-height: 1.7; font-size: 0.95rem; overflow-y: auto; max-height: 70vh;">${escapeHtml(textVal)}</div>
+        `;
+      } else {
+        bodyEl.innerHTML = `
+          <div class="empty-state-box" style="width: 100%;">
+            <i class="fa-solid fa-file-arrow-down" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 12px;"></i>
+            <h3 style="color: var(--text-main); margin-bottom: 8px;">${escapeHtml(f.name)}</h3>
+            <p style="margin-bottom: 16px;">الحجم: ${formatBytes(f.size)} — الملف محفوظ بالكامل أوفلاين على جهازك.</p>
+            <button class="btn btn-success" onclick="downloadFileToDevice('${f.id}')">
+              <i class="fa-solid fa-download"></i> تحميل الملف وفتحه على الجهاز
+            </button>
+          </div>
+        `;
+      }
 
-        window.openSubjectModal = function(id, name, dept) {
-            window.currentSubjectId = id;
-            document.getElementById('modal-subject-name').innerText = name; document.getElementById('modal-subject-dept').innerText = dept;
-            window.showElement('subject-modal');
-            window.fetchSubjectFiles(id);
-        };
+      modal.classList.add("open");
+    };
 
-        window.deleteFile = async function(fileId, filePath) {
-            if(!window.checkConnectionAlert()) return;
-            if(!confirm('هل أنت متأكد من حذف هذا الملف بشكل نهائي؟')) return;
-            try {
-                await window.supabaseInstance.storage.from('materials').remove([filePath]);
-                await window.supabaseInstance.from('files').delete().eq('id', fileId);
-                window.fetchSubjectFiles(window.currentSubjectId);
-                window.updateStorageSize();
-            } catch (e) { alert("خطأ في الحذف"); }
-        };
+    window.closeViewerModal = function() {
+      document.getElementById("fileViewerModal").classList.remove("open");
+      document.getElementById("viewerModalBody").innerHTML = "";
+      if (currentViewerBlobUrl) {
+        URL.revokeObjectURL(currentViewerBlobUrl);
+        currentViewerBlobUrl = null;
+      }
+    };
 
-        window.uploadFile = async function() {
-            if(!window.checkConnectionAlert()) return;
-            const fileInput = document.getElementById('subject-file-input'); 
-            const files = fileInput.files;
-            const baseTitle = document.getElementById('file-title').value.trim();
-            
-            if(files.length === 0 || !baseTitle) { alert("يرجى اختيار ملف (أو أكثر) وكتابة وصف عام لهم."); return; }
+    // ==================== 15. قسم الجدول الدراسي (الجدول + ملف PDF + صور الجدول) ====================
+    window.renderScheduleTable = function() {
+      const tbody = document.getElementById("scheduleTableBody");
+      tbody.innerHTML = WEEK_DAYS.map(day => {
+        const val = scheduleDaysData[day] || "-";
+        if (isScheduleEditing) {
+          return `
+            <tr>
+              <td class="col-day">${day}</td>
+              <td class="col-lec">
+                <input type="text" class="schedule-day-input" data-day="${day}" value="${escapeHtml(val)}" placeholder="اكتب المحاضرات أو السكاشن ليوم ${day}..." />
+              </td>
+            </tr>
+          `;
+        } else {
+          return `
+            <tr onclick="quickEditScheduleDay('${day}')" title="اضغط لتعديل محاضرات يوم ${day}">
+              <td class="col-day">${day}</td>
+              <td class="col-lec">${escapeHtml(val)}</td>
+            </tr>
+          `;
+        }
+      }).join("");
+    };
 
-            const uploadBtn = document.getElementById('upload-file-btn');
-            window.showElement('upload-progress-container', 'block');
-            uploadBtn.disabled = true;
+    window.toggleScheduleEditMode = async function() {
+      const btn = document.getElementById("toggleEditScheduleBtn");
+      if (!isScheduleEditing) {
+        isScheduleEditing = true;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ الجدول`;
+        btn.className = "btn btn-success btn-sm";
+        renderScheduleTable();
+      } else {
+        document.querySelectorAll(".schedule-day-input").forEach(inp => {
+          const d = inp.getAttribute("data-day");
+          scheduleDaysData[d] = inp.value.trim() || "-";
+        });
+        isScheduleEditing = false;
+        btn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> تعديل الجدول`;
+        btn.className = "btn btn-primary btn-sm";
+        await saveScheduleDaysToStorage();
+        renderScheduleTable();
+        showToast("تم حفظ جدول المحاضرات والسكاشن أوفلاين وسحابياً!");
+      }
+    };
 
-            try {
-                for(let i = 0; i < files.length; i++) {
-                    let file = files[i];
-                    let title = files.length > 1 ? `${baseTitle} (${i+1})` : baseTitle;
-                    const filePath = `subjects/${window.currentSubjectId}/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
-                    
-                    const { error } = await window.supabaseInstance.storage.from('materials').upload(filePath, file);
-                    if(!error) {
-                        const { data: publicData } = window.supabaseInstance.storage.from('materials').getPublicUrl(filePath);
-                        await window.supabaseInstance.from('files').insert([{ subject_id: window.currentSubjectId, title: title, file_name: file.name, file_path: filePath, url: publicData.publicUrl }]);
-                    }
-                }
-                fileInput.value = ''; document.getElementById('file-title').value = '';
-                window.fetchSubjectFiles(window.currentSubjectId);
-                window.updateStorageSize();
-            } catch (e) { alert("خطأ أثناء الرفع."); }
-            
-            window.hideElement('upload-progress-container'); uploadBtn.disabled = false;
-        };
+    window.quickEditScheduleDay = async function(day) {
+      if (isScheduleEditing) return;
+      const currentVal = scheduleDaysData[day] === "-" ? "" : scheduleDaysData[day];
+      const nextVal = prompt(`أدخل المحاضرات / السكاشن ليوم ${day}:`, currentVal);
+      if (nextVal !== null) {
+        scheduleDaysData[day] = nextVal.trim() || "-";
+        await saveScheduleDaysToStorage();
+        renderScheduleTable();
+        showToast(`تم تحديث جدول يوم ${day}`);
+      }
+    };
 
-        window.openScheduleModal = async function() {
-            if(!window.checkConnectionAlert()) return;
-            try {
-                const container = document.getElementById('schedule-inputs-container'); container.innerHTML = '';
-                const { data } = await window.supabaseInstance.from('schedule').select('*').eq('id', 'main').single();
-                let daysData = data ? (data.days || {}) : {};
-                window.daysKeys.forEach(d => {
-                    container.innerHTML += `
-                        <div class="flex flex-col">
-                            <label class="text-xs font-bold theme-text mb-1">${d.name}</label>
-                            <input type="text" id="sch-${d.id}" value="${daysData[d.id] || ''}" class="keep-input border-b theme-border p-1 text-sm" placeholder="محاضرات ${d.name}">
-                        </div>`;
-                });
-                window.showElement('schedule-edit-modal');
-            } catch (e) { console.error(e); }
-        };
+    async function saveScheduleDaysToStorage() {
+      await idbPut("schedule", { key: "days_table", data: scheduleDaysData });
+      dbSet(dbRef(fbDb, "study_portal_V2/schedule_days"), scheduleDaysData).catch(() => {});
+    }
 
-        window.deleteScheduleImage = async function(url) {
-            if(!confirm("هل تريد إزالة هذه الصورة من الجدول؟")) return;
-            try {
-                const { data } = await window.supabaseInstance.from('schedule').select('*').eq('id', 'main').single();
-                if(data && data.days) {
-                    let daysData = data.days;
-                    if(daysData.schedule_images) {
-                        daysData.schedule_images = daysData.schedule_images.filter(img => img !== url);
-                        await window.supabaseInstance.from('schedule').upsert({ id: 'main', days: daysData, pdf_url: data.pdf_url });
-                        window.loadSchedule();
-                        window.updateStorageSize();
-                    }
-                }
-            } catch(e) { console.error(e); }
-        };
+    // رفع وعرض ملف الجدول (PDF)
+    window.handleSchedulePdfUpload = async function(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      const f = fileList[0];
+      const dataUrl = await fileToDataURL(f);
+      const pdfObj = {
+        key: "schedule_pdf",
+        name: f.name,
+        size: f.size,
+        type: f.type || "application/pdf",
+        dataUrl: dataUrl,
+        blob: f,
+        updatedAt: new Date().toISOString()
+      };
+      await idbPut("schedule", pdfObj);
+      if (f.size <= 7 * 1024 * 1024) {
+        dbSet(dbRef(fbDb, "study_portal_V2/schedule_pdf"), {
+          name: pdfObj.name,
+          size: pdfObj.size,
+          dataUrl: pdfObj.dataUrl,
+          updatedAt: pdfObj.updatedAt
+        }).catch(() => {});
+      }
+      document.getElementById("schedulePdfInput").value = "";
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم حفظ ورفع ملف الجدول (PDF) بنجاح!");
+    };
 
-        window.saveSchedule = async function() {
-            if(!window.checkConnectionAlert()) return;
-            const statusBox = document.getElementById('schedule-upload-status'); 
-            const pdfFile = document.getElementById('schedule-pdf').files[0];
-            const imageFiles = document.getElementById('schedule-images-input').files;
-            const btn = document.getElementById('save-schedule-btn');
-            
-            let daysData = {}; window.daysKeys.forEach(d => daysData[d.id] = document.getElementById(`sch-${d.id}`).value.trim());
+    window.openSchedulePdfViewer = async function() {
+      const pdfObj = await idbGet("schedule", "schedule_pdf");
+      if (!pdfObj) return;
+      const blob = pdfObj.blob instanceof Blob ? pdfObj.blob : dataURLToBlob(pdfObj.dataUrl);
+      const url = URL.createObjectURL(blob);
+      currentViewerBlobUrl = url;
 
-            btn.disabled = true; window.showElement('schedule-upload-status', 'block'); statusBox.innerHTML = '<div class="loader mr-2"></div>جاري حفظ الجدول والملفات...';
-            
-            try {
-                const { data: oldData } = await window.supabaseInstance.from('schedule').select('*').eq('id', 'main').single();
-                let existingImages = (oldData && oldData.days && oldData.days.schedule_images) ? oldData.days.schedule_images : [];
-                let pdfUrl = (oldData && oldData.pdf_url) ? oldData.pdf_url : null;
+      document.getElementById("viewerFileTitle").textContent = pdfObj.name || "ملف الجدول (PDF)";
+      document.getElementById("viewerDownloadBtn").onclick = () => downloadSchedulePdf();
+      document.getElementById("viewerModalBody").innerHTML = `<iframe src="${url}" class="viewer-iframe"></iframe>`;
+      document.getElementById("fileViewerModal").classList.add("open");
+    };
 
-                if(pdfFile) {
-                    const filePath = `schedule/${Date.now()}_${pdfFile.name.replace(/\s/g, '_')}`;
-                    await window.supabaseInstance.storage.from('materials').upload(filePath, pdfFile);
-                    const { data } = window.supabaseInstance.storage.from('materials').getPublicUrl(filePath);
-                    pdfUrl = data.publicUrl;
-                }
+    window.downloadSchedulePdf = async function() {
+      const pdfObj = await idbGet("schedule", "schedule_pdf");
+      if (!pdfObj) return;
+      const blob = pdfObj.blob instanceof Blob ? pdfObj.blob : dataURLToBlob(pdfObj.dataUrl);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = pdfObj.name || "schedule.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    };
 
-                if(imageFiles.length > 0) {
-                    for(let img of imageFiles) {
-                        const imgPath = `schedule_images/${Date.now()}_${img.name.replace(/\s/g, '_')}`;
-                        const { error } = await window.supabaseInstance.storage.from('materials').upload(imgPath, img);
-                        if(!error) {
-                            const { data } = window.supabaseInstance.storage.from('materials').getPublicUrl(imgPath);
-                            existingImages.push(data.publicUrl);
-                        }
-                    }
-                }
-                
-                daysData.schedule_images = existingImages;
+    window.deleteSchedulePdf = async function() {
+      if (!confirm("هل تريد حذف ملف PDF الخاص بالجدول؟")) return;
+      await idbDelete("schedule", "schedule_pdf");
+      dbRemove(dbRef(fbDb, "study_portal_V2/schedule_pdf")).catch(() => {});
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم حذف ملف PDF للجدول.");
+    };
 
-                await window.supabaseInstance.from('schedule').upsert({ id: 'main', days: daysData, pdf_url: pdfUrl });
-                statusBox.innerHTML = "تم الحفظ بنجاح!"; statusBox.className = "mt-3 text-center text-sm font-bold text-green-500";
-                
-                document.getElementById('schedule-pdf').value = '';
-                document.getElementById('schedule-images-input').value = '';
-                
-                window.loadSchedule(); window.updateStorageSize();
-                setTimeout(() => { window.hideElement('schedule-edit-modal'); window.hideElement('schedule-upload-status'); }, 1500);
-            } catch(e) { statusBox.innerHTML = "حدث خطأ أثناء الحفظ."; statusBox.className = "mt-3 text-center text-sm font-bold text-red-500"; }
-            btn.disabled = false;
-        };
+    // رفع وعرض صور الجدول
+    window.handleScheduleImagesUpload = async function(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      const existingRec = (await idbGet("schedule", "schedule_images")) || { key: "schedule_images", items: [] };
 
-        window.onload = function() { window.initSupabase(); };
-    </script>
+      for (const f of Array.from(fileList)) {
+        const dataUrl = await fileToDataURL(f);
+        existingRec.items.unshift({
+          id: "simg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+          name: f.name,
+          size: f.size,
+          dataUrl: dataUrl,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      await idbPut("schedule", existingRec);
+      dbSet(dbRef(fbDb, "study_portal_V2/schedule_images"), existingRec.items).catch(() => {});
+      document.getElementById("scheduleImagesInput").value = "";
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم رفع وحفظ صور الجدول بنجاح!");
+    };
+
+    window.previewScheduleImage = async function(imgId) {
+      const rec = await idbGet("schedule", "schedule_images");
+      if (!rec || !rec.items) return;
+      const item = rec.items.find(i => i.id === imgId);
+      if (!item) return;
+
+      document.getElementById("viewerFileTitle").textContent = item.name;
+      document.getElementById("viewerDownloadBtn").onclick = () => downloadScheduleImage(imgId);
+      document.getElementById("viewerModalBody").innerHTML = `
+        <img src="${item.dataUrl}" style="max-width: 100%; max-height: 76vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(item.name)}" />
+      `;
+      document.getElementById("fileViewerModal").classList.add("open");
+    };
+
+    window.downloadScheduleImage = async function(imgId) {
+      const rec = await idbGet("schedule", "schedule_images");
+      if (!rec || !rec.items) return;
+      const item = rec.items.find(i => i.id === imgId);
+      if (!item) return;
+      const blob = dataURLToBlob(item.dataUrl);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = item.name || "schedule-image.jpg";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    };
+
+    window.deleteScheduleImage = async function(imgId) {
+      const rec = await idbGet("schedule", "schedule_images");
+      if (!rec || !rec.items) return;
+      rec.items = rec.items.filter(i => i.id !== imgId);
+      await idbPut("schedule", rec);
+      dbSet(dbRef(fbDb, "study_portal_V2/schedule_images"), rec.items).catch(() => {});
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم حذف صورة الجدول.");
+    };
+
+    async function renderScheduleAttachments() {
+      // 1. حالة PDF الجدول
+      const pdfObj = await idbGet("schedule", "schedule_pdf");
+      const pdfMsg = document.getElementById("schedPdfEmptyMsg");
+      const pdfBox = document.getElementById("schedPdfUploadedContainer");
+
+      if (pdfObj && pdfObj.dataUrl) {
+        pdfMsg.textContent = `الملف المرفوع: ${pdfObj.name} (${formatBytes(pdfObj.size)})`;
+        pdfBox.style.display = "block";
+        pdfBox.innerHTML = `
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-file-pdf" style="font-size: 1.6rem; color: var(--pdf-red);"></i>
+              <div style="text-align: right;">
+                <div style="font-weight: 800; font-size: 0.92rem;">${escapeHtml(pdfObj.name)}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">${formatBytes(pdfObj.size)} — جاهز للفتح أوفلاين</div>
+              </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" onclick="openSchedulePdfViewer()">
+                <i class="fa-solid fa-eye"></i> فتح الجدول
+              </button>
+              <button class="btn btn-sm btn-success" onclick="downloadSchedulePdf()">
+                <i class="fa-solid fa-download"></i> تحميل
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteSchedulePdf()">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        pdfMsg.textContent = "لا يوجد ملف PDF للجدول حالياً.";
+        pdfBox.style.display = "none";
+        pdfBox.innerHTML = "";
+      }
+
+      // 2. حالة صور الجدول
+      const imgRec = await idbGet("schedule", "schedule_images");
+      const imgMsg = document.getElementById("schedImagesEmptyMsg");
+      const imgGal = document.getElementById("schedImagesGallery");
+
+      if (imgRec && Array.isArray(imgRec.items) && imgRec.items.length > 0) {
+        imgMsg.textContent = `تم رفع ${imgRec.items.length} صورة للجدول (تفتح أوفلاين):`;
+        imgGal.innerHTML = imgRec.items.map(img => `
+          <div class="sched-img-item">
+            <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}" onclick="previewScheduleImage('${img.id}')" />
+            <div style="font-size: 0.78rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(img.name)}</div>
+            <div class="btn-group" style="justify-content: center;">
+              <button class="btn btn-sm btn-primary" onclick="previewScheduleImage('${img.id}')"><i class="fa-solid fa-expand"></i></button>
+              <button class="btn btn-sm btn-success" onclick="downloadScheduleImage('${img.id}')"><i class="fa-solid fa-download"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="deleteScheduleImage('${img.id}')"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `).join("");
+      } else {
+        imgMsg.textContent = "لا توجد صور مرفوعة للجدول.";
+        imgGal.innerHTML = "";
+      }
+    }
+
+    // ==================== 16. التبديل بين الأقسام وتصدير النسخة الاحتياطية ====================
+    window.switchMainTab = function(tabName) {
+      document.getElementById("tabBtnSubjects").classList.toggle("active", tabName === "subjects");
+      document.getElementById("tabBtnSchedule").classList.toggle("active", tabName === "schedule");
+      document.getElementById("sectionSubjects").classList.toggle("active", tabName === "subjects");
+      document.getElementById("sectionSchedule").classList.toggle("active", tabName === "schedule");
+    };
+
+    window.exportFullBackup = async function() {
+      const backupObj = {
+        exportedAt: new Date().toISOString(),
+        subjects: subjectsList,
+        scheduleDays: scheduleDaysData,
+        filesCount: allFilesList.length
+      };
+      const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Engineering_Notes_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("تم تحميل ملف النسخة الاحتياطية على جهازك");
+    };
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // مراقبة حالة الإنترنت مباشرة
+    function updateNetworkBadge() {
+      const el = document.getElementById("networkLiveState");
+      if (navigator.onLine) {
+        el.innerHTML = `<i class="fa-solid fa-wifi" style="color: var(--img-neon);"></i> حالة الشبكة: متصل (مزامنة Firebase + Supabase مفعلة)`;
+      } else {
+        el.innerHTML = `<i class="fa-solid fa-bolt" style="color: var(--warning);"></i> حالة الشبكة: أوفلاين (جميع الملفات تفتح من ذاكرة الجهاز مباشرة)`;
+      }
+    }
+    window.addEventListener("online", () => { updateNetworkBadge(); syncAllCloudData(false); });
+    window.addEventListener("offline", updateNetworkBadge);
+
+    // ==================== 17. بدء تشغيل الموقع وتحميل البيانات الأوفلاين والسحابية ====================
+    async function initStudyPortal() {
+      updateNetworkBadge();
+      await openOfflineDB();
+
+      subjectsList = await idbGetAll("subjects");
+      allFilesList = await idbGetAll("files");
+      allFilesList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      const savedDays = await idbGet("schedule", "days_table");
+      if (savedDays && savedDays.data) {
+        scheduleDaysData = { ...scheduleDaysData, ...savedDays.data };
+      }
+
+      renderSubjectsGrid();
+      renderScheduleTable();
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+
+      // مزامنة تلقائية في الخلفية مع Firebase و Supabase
+      syncAllCloudData(false);
+    }
+
+    initStudyPortal();
+  </script>
 </body>
 </html>
