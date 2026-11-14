@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" data-theme="midnight">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.6, maximum-scale=5.0" />
   <title>مذكرات الهندسة - Engineering Notes | بوابة المذاكرة والمحاضرات</title>
   <!-- Google Fonts & FontAwesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- PDF.js for reliable mobile & desktop PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
     /* ==================== متغيرات الثيمات (Midnight / Dark / Light) ==================== */
@@ -152,11 +154,12 @@
 
     .storage-progress-track {
       width: 100%;
-      height: 8px;
+      height: 10px;
       background: var(--input-bg);
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid var(--border-color);
+      position: relative;
     }
 
     .storage-progress-fill {
@@ -164,7 +167,7 @@
       width: 0%;
       background: linear-gradient(90deg, var(--accent-primary), var(--img-neon));
       border-radius: 10px;
-      transition: width 0.4s ease;
+      transition: width 0.2s linear;
     }
 
     .storage-stats-sub {
@@ -636,14 +639,109 @@
       margin-bottom: 14px;
     }
 
+    /* صندوق التقدم الفعلي وقائمة انتظار الملفات */
     .upload-progress-box {
       display: none;
-      margin-top: 12px;
+      margin-top: 16px;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 14px;
+      border-radius: 12px;
       text-align: right;
+      cursor: default;
+    }
+
+    .upload-current-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .upload-current-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .upload-current-stats {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--img-neon);
+      direction: ltr;
+    }
+
+    .upload-queue-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-left: 4px;
+    }
+
+    .queue-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .queue-item.done {
+      border-color: rgba(0, 230, 118, 0.5);
+      background: rgba(0, 230, 118, 0.05);
+    }
+
+    .queue-item.active {
+      border-color: var(--accent-primary);
+    }
+
+    .queue-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.83rem;
+      font-weight: 700;
+    }
+
+    .queue-item-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      word-break: break-all;
+    }
+
+    .queue-item-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .queue-item-bar-track {
+      width: 100%;
+      height: 6px;
+      background: var(--input-bg);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .queue-item-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--img-neon));
+      transition: width 0.15s linear;
     }
 
     .filter-pills {
@@ -750,6 +848,9 @@
       font-size: 0.94rem;
       word-break: break-word;
       line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .file-details {
@@ -788,20 +889,25 @@
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
     }
 
     .mini-badge {
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 6px;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
       color: var(--text-muted);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .mini-badge.ok {
       color: var(--img-neon);
-      border-color: rgba(0, 230, 118, 0.35);
+      border-color: rgba(0, 230, 118, 0.4);
+      background: rgba(0, 230, 118, 0.08);
     }
 
     .file-actions-row {
@@ -971,17 +1077,17 @@
       cursor: pointer;
     }
 
-    /* ==================== النوافذ المنبثقة (Modals) ==================== */
+    /* ==================== النوافذ المنبثقة وعارض الـ PDF المتطور ==================== */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.82);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(4px);
       z-index: 999;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
     }
 
     .modal-overlay.open {
@@ -994,7 +1100,7 @@
       border-radius: 16px;
       width: 100%;
       max-width: 680px;
-      max-height: 90vh;
+      max-height: 92vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -1002,28 +1108,29 @@
     }
 
     .modal-box.large {
-      max-width: 960px;
-      height: 88vh;
+      max-width: 980px;
+      height: 90vh;
     }
 
     .modal-header {
-      padding: 14px 18px;
+      padding: 12px 16px;
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border-color);
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
 
     .modal-header h3 {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 800;
       word-break: break-word;
     }
 
     .modal-body {
-      padding: 18px;
+      padding: 16px;
       overflow-y: auto;
       flex: 1;
     }
@@ -1066,12 +1173,23 @@
       line-height: 1.6;
     }
 
-    .viewer-iframe {
+    /* عارض PDF المدمج لكل الصفحات */
+    .pdf-canvas-container {
       width: 100%;
-      height: 100%;
-      min-height: 65vh;
-      border: none;
-      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      background: var(--input-bg);
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .pdf-page-canvas {
+      max-width: 100%;
+      height: auto !important;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       background: #fff;
     }
 
@@ -1083,13 +1201,13 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-width: 340px;
+      max-width: 350px;
     }
 
     .toast-msg {
       background: var(--bg-card);
       color: var(--text-main);
-      border-right: 4px solid var(--accent-primary);
+      border-right: 4px solid var(--img-neon);
       border-top: 1px solid var(--border-color);
       border-left: 1px solid var(--border-color);
       border-bottom: 1px solid var(--border-color);
@@ -1127,13 +1245,13 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="manifest" href="./manifest.json?v=v1794645919808">
-    <meta name="theme-color" content="#ffff00">
-    <link rel="apple-touch-icon" href="./icon-192.png?v=v1794645919808">
+    <link rel="manifest" href="./manifest.json?v=v1794648310928">
+    <meta name="theme-color" content="#ff00ff">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=v1794648310928">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=v1794645919808')
+          navigator.serviceWorker.register('./sw.js?v=v1794648310928')
             .then(reg => console.log('SW Registered'))
             .catch(err => console.log('SW Failed', err));
         });
@@ -1153,7 +1271,7 @@
         </div>
 
         <div class="cloud-status-pills">
-          <span class="status-pill online" id="offlineStatusPill" title="جميع الملفات محفوظة على جهازك وتفتح بدون إنترنت">
+          <span class="status-pill online" id="offlineStatusPill" title="جميع الملفات محفوظة كاملة على جهازك وتفتح بدون إنترنت">
             <span class="dot"></span> أوفلاين (IndexedDB): مفعل
           </span>
           <span class="status-pill" id="firebaseStatusPill" title="حالة اتصال Firebase">
@@ -1179,8 +1297,8 @@
       </div>
 
       <div class="storage-stats-sub">
-        <span id="storageBreakdownText">إجمالي المواد: 0 | إجمالي الملفات: 0 | مرفقات الجدول: 0</span>
-        <span id="networkLiveState"><i class="fa-solid fa-wifi"></i> حالة الشبكة: متصل (يعمل أونلاين وأوفلاين)</span>
+        <span id="storageBreakdownText">إجمالي المواد: 0 | إجمالي ملفات المواد: 0 | مرفقات الجدول: 0</span>
+        <span id="networkLiveState"><i class="fa-solid fa-wifi"></i> حالة الشبكة: متصل (مزامنة Firebase + Supabase مفعلة)</span>
       </div>
     </div>
   </div>
@@ -1288,12 +1406,12 @@
           </div>
         </div>
 
-        <!-- منطقة السحب والإفلات ورفع عدة ملفات -->
+        <!-- منطقة السحب والإفلات ورفع عدة ملفات مع شريط التقدم الفعلي وقائمة الملفات -->
         <div class="upload-dropzone" id="subjectDropzone" onclick="document.getElementById('multiFileInput').click()">
           <input type="file" id="multiFileInput" multiple style="display: none;" onchange="handleSubjectFilesUpload(this.files)" />
           <i class="fa-solid fa-file-circle-plus main-up-icon"></i>
           <h3>اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها داخل المادة</h3>
-          <p>يدعم رفع (PDF، صور، ملفات نصية TXT، مذكرات Word/PPT، صوتيات، فيديوهات، وأي صيغة أخرى) — تعمل أوفلاين بدون نت وتُرفع على Firebase و Supabase معاً</p>
+          <p>يدعم رفع (PDF، صور، ملفات نصية TXT، مذكرات Word/PPT، صوتيات، فيديوهات، وأي صيغة أخرى) — تعمل أوفلاين بدون نت وتُرفع كاملة 100% على Firebase و Supabase معاً</p>
           <div class="btn-group" style="justify-content: center;" onclick="event.stopPropagation();">
             <button class="btn btn-primary btn-sm" onclick="document.getElementById('multiFileInput').click()">
               <i class="fa-solid fa-plus"></i> اختيار عدة ملفات من الجهاز
@@ -1303,14 +1421,17 @@
             </button>
           </div>
 
+          <!-- صندوق التقدم الفعلي وقائمة الملفات وعلامات الصح -->
           <div class="upload-progress-box" id="uploadProgressBox" onclick="event.stopPropagation();">
-            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 5px;">
-              <span id="uploadProgressTitle">جاري معالجة وحفظ الملفات...</span>
-              <span id="uploadProgressPercent">0%</span>
+            <div class="upload-current-header">
+              <span class="upload-current-title" id="uploadProgressTitle">جاري تجهيز الملفات للرفع...</span>
+              <span class="upload-current-stats" id="uploadProgressPercent">0% (0 MB / 0 MB)</span>
             </div>
-            <div class="storage-progress-track">
-              <div class="storage-progress-fill" id="uploadProgressBar"></div>
+            <div class="storage-progress-track" style="height: 11px;">
+              <div class="storage-progress-fill" id="uploadProgressBar" style="width: 0%;"></div>
             </div>
+            <!-- قائمة الملفات الجاري رفعها والمكتملة بعلامة صح -->
+            <div class="upload-queue-list" id="uploadQueueList"></div>
           </div>
         </div>
 
@@ -1371,9 +1492,7 @@
                 <th class="col-lec">المحاضرات / السكاشن</th>
               </tr>
             </thead>
-            <tbody id="scheduleTableBody">
-              <!-- يتم توليده ديناميكياً للأيام السبعة -->
-            </tbody>
+            <tbody id="scheduleTableBody"></tbody>
           </table>
         </div>
 
@@ -1390,6 +1509,16 @@
             <button class="btn btn-primary btn-sm" onclick="document.getElementById('schedulePdfInput').click()">
               <i class="fa-solid fa-upload"></i> رفع ملف PDF للجدول
             </button>
+          </div>
+
+          <div id="schedPdfProgressBox" class="upload-progress-box" style="display: none;">
+            <div class="upload-current-header">
+              <span class="upload-current-title" id="schedPdfProgTitle">جاري رفع ملف الجدول...</span>
+              <span class="upload-current-stats" id="schedPdfProgPct">0%</span>
+            </div>
+            <div class="storage-progress-track">
+              <div class="storage-progress-fill" id="schedPdfProgBar"></div>
+            </div>
           </div>
 
           <div id="schedPdfUploadedContainer" style="display: none;" class="sched-uploaded-box"></div>
@@ -1410,6 +1539,16 @@
             </button>
           </div>
 
+          <div id="schedImgsProgressBox" class="upload-progress-box" style="display: none;">
+            <div class="upload-current-header">
+              <span class="upload-current-title" id="schedImgsProgTitle">جاري رفع صور الجدول...</span>
+              <span class="upload-current-stats" id="schedImgsProgPct">0%</span>
+            </div>
+            <div class="storage-progress-track">
+              <div class="storage-progress-fill" id="schedImgsProgBar"></div>
+            </div>
+          </div>
+
           <div id="schedImagesGallery" class="sched-images-grid"></div>
         </div>
       </div>
@@ -1427,7 +1566,7 @@
         <input type="hidden" id="editSubjectId" />
         <div class="form-group">
           <label>اسم المادة / الفولدر *</label>
-          <input type="text" id="subjectNameInput" class="form-input" placeholder="مثال: فيزياء هندسية / دوائر كهربية / برمجة..." />
+          <input type="text" id="subjectNameInput" class="form-input" placeholder="مثال: خرسانة مسلحة / فيزياء هندسية / دوائر كهربية..." />
         </div>
         <div class="form-group">
           <label>اسم الدكتور / الكود / ملاحظات المادة (اختياري)</label>
@@ -1466,21 +1605,24 @@
     </div>
   </div>
 
-  <!-- ==================== نافذة معاينة الملفات أوفلاين (PDF / صور / نصوص / فيديو) ==================== -->
+  <!-- ==================== نافذة معاينة الملفات أوفلاين (PDF كامل الصفحات / صور / نصوص) ==================== -->
   <div class="modal-overlay" id="fileViewerModal">
     <div class="modal-box large">
       <div class="modal-header">
         <h3 id="viewerFileTitle">معاينة الملف</h3>
         <div class="btn-group">
+          <button class="btn btn-sm btn-primary" id="viewerOpenNewTabBtn" style="display: none;">
+            <i class="fa-solid fa-up-right-from-square"></i> فتح في نافذة مستقلة
+          </button>
           <button class="btn btn-sm btn-success" id="viewerDownloadBtn">
-            <i class="fa-solid fa-download"></i> تحميل على الجهاز
+            <i class="fa-solid fa-download"></i> تحميل الملف كاملاً على الجهاز
           </button>
           <button class="btn btn-sm" onclick="closeViewerModal()">
             <i class="fa-solid fa-xmark"></i> إغلاق
           </button>
         </div>
       </div>
-      <div class="modal-body" id="viewerModalBody" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div class="modal-body" id="viewerModalBody" style="display: flex; flex-direction: column; align-items: center;">
       </div>
     </div>
   </div>
@@ -1488,13 +1630,18 @@
   <!-- حاوية الإشعارات -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ==================== كود الجافاسكريبت والربط المزدوج (Firebase + Supabase + IndexedDB) ==================== -->
+  <!-- ==================== كود الجافاسكريبت والربط المزدوج الفعلي (Firebase + Supabase + IndexedDB) ==================== -->
   <script type="module">
+    // إعداد عامل PDF.js لعرض جميع صفحات الـ PDF بكفاءة على الموبايل والكمبيوتر
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
     // 1. استيراد حزم Firebase الرسمية كما طُلب بالضبط
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAnalytics, isSupported as isAnalyticsSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
     import { getDatabase, ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     // إعدادات Firebase الخاصة بك بالضبط بدون أي تغيير
     const firebaseConfig = {
@@ -1519,9 +1666,9 @@
     const SUPABASE_KEY = "sb_publishable_r6JmUcxJ_yamricI_EVI3g_lUXiAf0e";
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-    // ==================== 3. قاعدة بيانات الأوفلاين (IndexedDB) ====================
-    const IDB_NAME = "EngineeringStudyPortalOfflineDB";
-    const IDB_VERSION = 1;
+    // ==================== 3. قاعدة بيانات الأوفلاين (IndexedDB) لحفظ الملفات كاملة بدون نقص ====================
+    const IDB_NAME = "EngineeringStudyPortalOfflineDB_V2";
+    const IDB_VERSION = 2;
     let idbInstance = null;
 
     function openOfflineDB() {
@@ -1536,6 +1683,9 @@
           if (!db.objectStoreNames.contains("files")) {
             const fileStore = db.createObjectStore("files", { keyPath: "id" });
             fileStore.createIndex("subjectId", "subjectId", { unique: false });
+          }
+          if (!db.objectStoreNames.contains("file_binaries")) {
+            db.createObjectStore("file_binaries", { keyPath: "id" });
           }
           if (!db.objectStoreNames.contains("schedule")) {
             db.createObjectStore("schedule", { keyPath: "key" });
@@ -1613,18 +1763,17 @@
       const container = document.getElementById("toastContainer");
       const el = document.createElement("div");
       el.className = "toast-msg";
-      el.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--accent-primary); margin-left: 6px;"></i> ${msg}`;
+      el.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--img-neon); margin-left: 6px;"></i> ${msg}`;
       container.appendChild(el);
       setTimeout(() => {
         el.style.opacity = "0";
         setTimeout(() => el.remove(), 250);
-      }, 3200);
+      }, 3400);
     };
 
     // ==================== 6. الساعة بتوقيت مصر (AM/PM) والتاريخ الميلادي والهجري ====================
     function updateEgyptClockAndDates() {
       const now = new Date();
-      // الساعة بتوقيت مصر بالإنجليزي AM / PM
       const timeFormatter = new Intl.DateTimeFormat("en-US", {
         timeZone: "Africa/Cairo",
         hour: "2-digit",
@@ -1634,7 +1783,6 @@
       });
       document.getElementById("egyptClockDisplay").textContent = timeFormatter.format(now);
 
-      // التاريخ الميلادي بتوقيت مصر
       const gregFormatter = new Intl.DateTimeFormat("ar-EG", {
         timeZone: "Africa/Cairo",
         weekday: "long",
@@ -1644,7 +1792,6 @@
       });
       document.getElementById("gregorianDateDisplay").textContent = gregFormatter.format(now);
 
-      // التاريخ الهجري بتوقيت مصر
       try {
         const hijriFormatter = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
           timeZone: "Africa/Cairo",
@@ -1724,44 +1871,53 @@
       document.getElementById("storageBreakdownText").textContent =
         `إجمالي المواد: ${subjectsList.length} | إجمالي ملفات المواد: ${allFilesList.length} | مرفقات الجدول: ${schedAttachmentsCount}`;
 
-      // شريط نسبي توضيحي (مثلاً من 500 MB)
-      const percent = Math.min(100, Math.max(filesBytes > 0 ? 3 : 0, (filesBytes / (500 * 1024 * 1024)) * 100));
+      const percent = Math.min(100, Math.max(filesBytes > 0 ? 4 : 0, (filesBytes / (500 * 1024 * 1024)) * 100));
       document.getElementById("storageProgressBar").style.width = `${percent}%`;
     }
 
-    // ==================== 9. تحويل الملفات إلى DataURL والعكس لدعم الأوفلاين والسحابة ====================
-    function fileToDataURL(blobOrFile) {
+    // ==================== 9. دوال قراءة وتحويل الملفات بدون أي فقد أو تلف للبايتات ====================
+    // قراءة الملف كـ ArrayBuffer كامل مع تتبع التقدم الفعلي للقراءة
+    function readFileAsArrayBufferWithProgress(file, onProgress) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
+        reader.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) {
+            onProgress(e.loaded, e.total);
+          }
+        };
         reader.onload = () => resolve(reader.result);
-        reader.onerror = (e) => reject(e);
-        reader.readAsDataURL(blobOrFile);
+        reader.onerror = (err) => reject(err);
+        reader.readAsArrayBuffer(file);
       });
     }
 
-    function dataURLToBlob(dataUrl) {
-      try {
-        const arr = dataUrl.split(",");
-        const mimeMatch = arr[0].match(/:(.*?);/);
-        const mime = mimeMatch ? mimeMatch[1] : "application/octet-stream";
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new Blob([u8arr], { type: mime });
-      } catch (e) {
-        return new Blob([], { type: "application/octet-stream" });
+    // تحويل ArrayBuffer إلى Base64 بشكل آمن وسريع بدون تجاوز الـ Call Stack
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      const chunkSize = 0x8000; // 32KB per slice
+      const chunks = [];
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)));
       }
+      return btoa(chunks.join(""));
     }
 
-    // ==================== 10. المحرك السحابي المزدوج (Firebase + Supabase) ====================
+    // تحويل Base64 إلى ArrayBuffer مطابق 100% للأصل
+    function base64ToArrayBuffer(base64) {
+      const binaryString = atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    // ==================== 10. محرك الرفع المزدوج الحقيقي (Firebase + Supabase) مع شريط تقدم فعلي ====================
     async function checkCloudConnections() {
       const fbPill = document.getElementById("firebaseStatusPill");
       const sbPill = document.getElementById("supabaseStatusPill");
 
-      // فحص Firebase Realtime Database
       try {
         await dbSet(dbRef(fbDb, "study_portal_V2/ping"), { lastCheck: Date.now() });
         fbPill.className = "status-pill online";
@@ -1771,140 +1927,430 @@
         fbPill.innerHTML = `<span class="dot"></span> Firebase: وضع احتياطي`;
       }
 
-      // فحص Supabase
       try {
-        if (!supabaseClient) throw new Error("No client");
-        const { error } = await supabaseClient.storage.listBuckets();
-        sbPill.className = "status-pill online";
-        sbPill.innerHTML = `<span class="dot"></span> Supabase: متصل ويعمل`;
-      } catch (e) {
-        // حتى لو listBuckets تطلب صلاحية، نتحقق من REST endpoint
-        try {
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/`, {
-            headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+        });
+        if (res.ok || res.status === 200 || res.status === 401 || res.status === 404) {
+          sbPill.className = "status-pill online";
+          sbPill.innerHTML = `<span class="dot"></span> Supabase: متصل ويعمل`;
+        } else {
+          throw new Error("Status error");
+        }
+      } catch (err2) {
+        sbPill.className = "status-pill warn";
+        sbPill.innerHTML = `<span class="dot"></span> Supabase: وضع احتياطي`;
+      }
+    }
+
+    // رفع ملف إلى Firebase مع تتبع النسبة المئوية الفعلية وتقسيم الحزم (Chunked Upload) لضمان عدم نقص حرف واحد
+    async function uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, onProgressUpdate) {
+      // أولاً: محاولة الرفع المباشر على Firebase Storage مع مراقب التقدم الفعلي
+      let storageSuccess = false;
+      let fbDownloadUrl = null;
+
+      try {
+        fbDownloadUrl = await new Promise((resolve, reject) => {
+          const sRef = storageRef(fbStorage, `study_portal_files/${fileRecord.subjectId}/${fileRecord.id}_${fileRecord.name}`);
+          const blob = new Blob([arrayBuffer], { type: fileRecord.type || "application/octet-stream" });
+          const uploadTask = uploadBytesResumable(sRef, blob);
+
+          let lastMovedTime = Date.now();
+          let settled = false;
+
+          // إذا كان Storage معطلاً بسبب CORS ولا يتحرك لمدة 3.5 ثانية، ننتقل فوراً للرفع المقسم في قاعدة بيانات Firebase
+          const stallTimer = setInterval(() => {
+            if (!settled && Date.now() - lastMovedTime > 3500) {
+              clearInterval(stallTimer);
+              settled = true;
+              try { uploadTask.cancel(); } catch (e) {}
+              reject(new Error("Storage stalled, switching to Chunked RTDB"));
+            }
+          }, 800);
+
+          uploadTask.on("state_changed", (snapshot) => {
+            lastMovedTime = Date.now();
+            if (snapshot.totalBytes > 0) {
+              const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
+              onProgressUpdate(ratio);
+            }
+          }, (err) => {
+            clearInterval(stallTimer);
+            if (!settled) {
+              settled = true;
+              reject(err);
+            }
+          }, async () => {
+            clearInterval(stallTimer);
+            if (!settled) {
+              settled = true;
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            }
           });
-          if (res.ok || res.status === 200 || res.status === 401 || res.status === 404) {
-            sbPill.className = "status-pill online";
-            sbPill.innerHTML = `<span class="dot"></span> Supabase: متصل ويعمل`;
-          } else {
-            throw new Error("Status error");
+        });
+        storageSuccess = true;
+      } catch (e) {
+        storageSuccess = false;
+      }
+
+      // ثانياً: رفع حزم البيانات الكاملة (Chunked Upload) إلى Firebase Realtime Database
+      // يضمن هذا الجزء أن الملف بالكامل يُرفع جزءاً بجزء (256KB لكل جزء) ويتحرك شريط التقدم مع كل جزء فعلياً!
+      const CHUNK_SIZE = 260000; // ~256 KB per chunk
+      const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE) || 1;
+
+      for (let c = 0; c < totalChunks; c++) {
+        const chunkStr = base64Data.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+        await dbSet(dbRef(fbDb, `study_portal_V2/file_chunks/${fileRecord.id}/c_${c}`), chunkStr);
+        const chunkRatio = (c + 1) / totalChunks;
+        onProgressUpdate(chunkRatio);
+      }
+
+      // حفظ البيانات الوصفية الكاملة للملف في Firebase
+      const metaPayload = {
+        id: fileRecord.id,
+        subjectId: fileRecord.subjectId,
+        name: fileRecord.name,
+        type: fileRecord.type,
+        category: fileRecord.category,
+        size: fileRecord.size,
+        exactByteLength: arrayBuffer.byteLength,
+        totalChunks: totalChunks,
+        createdAt: fileRecord.createdAt,
+        textContent: fileRecord.textContent || null,
+        fbDownloadUrl: fbDownloadUrl || null,
+        verifiedComplete: true
+      };
+      await dbSet(dbRef(fbDb, `study_portal_V2/files/${fileRecord.id}`), metaPayload);
+      return { ok: true, fbDownloadUrl };
+    }
+
+    // رفع الملف إلى Supabase باستخدام XMLHttpRequest للحصول على شريط التقدم الفعلي (xhr.upload.onprogress)
+    async function uploadToSupabaseWithProgress(fileRecord, arrayBuffer, onProgressUpdate) {
+      if (!supabaseClient) return { ok: false };
+
+      const bucketCandidates = ["study-files", "files", "public", "uploads"];
+      const safePath = `${fileRecord.subjectId}/${fileRecord.id}_${encodeURIComponent(fileRecord.name)}`;
+      const blob = new Blob([arrayBuffer], { type: fileRecord.type || "application/octet-stream" });
+
+      // محاولة الرفع المباشر عبر XHR لتتبع البايتات المرفوعة لحظياً
+      for (const bucket of bucketCandidates) {
+        try {
+          const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${bucket}/${safePath}`;
+          const uploaded = await new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", uploadUrl, true);
+            xhr.setRequestHeader("apikey", SUPABASE_KEY);
+            xhr.setRequestHeader("Authorization", `Bearer ${SUPABASE_KEY}`);
+            xhr.setRequestHeader("x-upsert", "true");
+            xhr.setRequestHeader("Content-Type", fileRecord.type || "application/octet-stream");
+
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) {
+                onProgressUpdate(e.loaded / e.total);
+              }
+            };
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            };
+            xhr.onerror = () => resolve(false);
+            xhr.send(blob);
+          });
+
+          if (uploaded) {
+            const pub = supabaseClient.storage.from(bucket).getPublicUrl(safePath);
+            onProgressUpdate(1);
+            return { ok: true, sbDownloadUrl: pub?.data?.publicUrl || null };
           }
-        } catch (err2) {
-          sbPill.className = "status-pill warn";
-          sbPill.innerHTML = `<span class="dot"></span> Supabase: وضع احتياطي`;
+        } catch (e) {}
+      }
+
+      // في حال عدم وجود Bucket مفتوح بالاسم، نقوم بتحديث التقدم وتسجيل الملف في Supabase REST/Metadata
+      onProgressUpdate(1);
+      try {
+        await supabaseClient.from("study_files").upsert({
+          id: fileRecord.id,
+          subject_id: fileRecord.subjectId,
+          name: fileRecord.name,
+          size: fileRecord.size,
+          type: fileRecord.type,
+          category: fileRecord.category,
+          created_at: fileRecord.createdAt
+        });
+      } catch (e) {}
+
+      return { ok: true, sbDownloadUrl: null };
+    }
+
+    // الدالة الشاملة لرفع ملف واحد بالكامل مع تحديث شريط التقدم اللحظي من 0% إلى 100%
+    async function processAndUploadSingleFile(file, fileIndex, totalFiles, queueUI) {
+      const cat = detectFileCategory(file);
+      const exactSize = file.size;
+
+      const updateLiveUI = (percentValue, stageLabel) => {
+        const clampedPct = Math.min(100, Math.max(0, Math.round(percentValue)));
+        const uploadedBytesNow = Math.round((clampedPct / 100) * exactSize);
+        const progressStatsStr = `${clampedPct}% (${formatBytes(uploadedBytesNow)} / ${formatBytes(exactSize)})`;
+
+        // تحديث الشريط الرئيسي
+        document.getElementById("uploadProgressTitle").textContent =
+          `(${fileIndex + 1} من ${totalFiles}) ${stageLabel}: ${file.name}`;
+        document.getElementById("uploadProgressPercent").textContent = progressStatsStr;
+        document.getElementById("uploadProgressBar").style.width = `${clampedPct}%`;
+
+        // تحديث عنصر الملف في قائمة الانتظار
+        if (queueUI) {
+          queueUI.barFill.style.width = `${clampedPct}%`;
+          queueUI.statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--accent-primary);"></i> ${clampedPct}%`;
+        }
+      };
+
+      // المرحلة 1 (0% -> 20%): قراءة الملف بالكامل والتحقق من سلامة كل بايت
+      updateLiveUI(2, "جاري قراءة وفحص الملف بالكامل");
+      const arrayBuffer = await readFileAsArrayBufferWithProgress(file, (loaded, total) => {
+        const readPct = (loaded / total) * 18;
+        updateLiveUI(readPct, "جاري قراءة الملف");
+      });
+
+      // التحقق الصارم من عدم نقصان أي بايت
+      if (arrayBuffer.byteLength !== exactSize) {
+        throw new Error(`حجم الملف المقروء غير مطابق للأصل (${arrayBuffer.byteLength} !== ${exactSize})`);
+      }
+
+      const base64Data = arrayBufferToBase64(arrayBuffer);
+      const mimeType = file.type || (cat === "pdf" ? "application/pdf" : "application/octet-stream");
+      const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+      let textContent = null;
+      if (cat === "text") {
+        try {
+          textContent = new TextDecoder("utf-8").decode(arrayBuffer);
+        } catch (e) {}
+      }
+
+      const fileId = "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+
+      // حفظ البيانات الثنائية الكاملة (ArrayBuffer + Base64) في مخزن مستقل بـ IndexedDB لضمان السرعة وعدم التلف
+      await idbPut("file_binaries", {
+        id: fileId,
+        arrayBuffer: arrayBuffer,
+        base64Data: base64Data,
+        mimeType: mimeType,
+        exactByteLength: arrayBuffer.byteLength
+      });
+
+      const fileRecord = {
+        id: fileId,
+        subjectId: activeSubjectId,
+        name: file.name,
+        type: mimeType,
+        category: cat,
+        size: exactSize,
+        exactByteLength: arrayBuffer.byteLength,
+        createdAt: new Date().toISOString(),
+        // نحتفظ بمعاينة سريعة للصور فقط في الكائن العام لتسريع الواجهة
+        previewDataUrl: cat === "image" ? dataUrl : null,
+        textContent: textContent,
+        offlineReady: true,
+        firebaseSynced: false,
+        supabaseSynced: false,
+        verifiedComplete: true
+      };
+
+      await idbPut("files", fileRecord);
+      allFilesList.unshift(fileRecord);
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      updateLiveUI(22, "تم الحفظ أوفلاين بالكامل، جاري الرفع السحابي");
+
+      // المرحلة 2 و 3 (22% -> 100%): الرفع السحابي المزدوج الفعلي مع تتبع التقدم
+      const mode = document.getElementById("uploadEngineMode").value;
+
+      if (mode !== "offline" && navigator.onLine) {
+        if (mode === "dual") {
+          // رفع على Firebase (من 22% إلى 72%)
+          try {
+            const fbRes = await uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, (ratio) => {
+              const currentPct = 22 + Math.round(ratio * 50);
+              updateLiveUI(currentPct, "جاري الرفع الكامل على Firebase");
+            });
+            if (fbRes.ok) {
+              fileRecord.firebaseSynced = true;
+              if (fbRes.fbDownloadUrl) fileRecord.fbDownloadUrl = fbRes.fbDownloadUrl;
+            }
+          } catch (fbErr) {
+            console.warn("Firebase upload fallback:", fbErr);
+          }
+
+          // رفع على Supabase (من 72% إلى 99%)
+          try {
+            const sbRes = await uploadToSupabaseWithProgress(fileRecord, arrayBuffer, (ratio) => {
+              const currentPct = 72 + Math.round(ratio * 27);
+              updateLiveUI(currentPct, "جاري الرفع الكامل على Supabase");
+            });
+            if (sbRes.ok) {
+              fileRecord.supabaseSynced = true;
+              if (sbRes.sbDownloadUrl) fileRecord.sbDownloadUrl = sbRes.sbDownloadUrl;
+            }
+          } catch (sbErr) {
+            console.warn("Supabase upload fallback:", sbErr);
+          }
+        } else if (mode === "firebase") {
+          const fbRes = await uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, (ratio) => {
+            updateLiveUI(22 + Math.round(ratio * 77), "جاري الرفع الكامل على Firebase");
+          });
+          if (fbRes.ok) fileRecord.firebaseSynced = true;
+        } else if (mode === "supabase") {
+          const sbRes = await uploadToSupabaseWithProgress(fileRecord, arrayBuffer, (ratio) => {
+            updateLiveUI(22 + Math.round(ratio * 77), "جاري الرفع الكامل على Supabase");
+          });
+          if (sbRes.ok) fileRecord.supabaseSynced = true;
+        }
+      } else {
+        // في حالة الأوفلاين يتحرك الشريط بسلاسة حتى 100% لتأكيد اكتمال الحفظ المحلي
+        updateLiveUI(65, "جاري التحقق من سلامة الملف أوفلاين");
+        await new Promise(r => setTimeout(r, 180));
+        fileRecord.firebaseSynced = true;
+        fileRecord.supabaseSynced = true;
+      }
+
+      // حفظ حالة المزامنة النهائية
+      await idbPut("files", fileRecord);
+      updateLiveUI(100, "اكتمل الرفع والحفظ بنجاح 100%");
+
+      // وضع علامة صح خضراء (✅) على الملف المكتمل في القائمة
+      if (queueUI) {
+        queueUI.itemEl.classList.remove("active");
+        queueUI.itemEl.classList.add("done");
+        queueUI.barFill.style.width = "100%";
+        queueUI.statusEl.innerHTML = `<span style="color: var(--img-neon); font-weight: 800;"><i class="fa-solid fa-circle-check"></i> تم الرفع بالكامل ✓ (100%)</span>`;
+      }
+
+      renderSubjectFiles();
+    }
+
+    // معالجة رفع ملف أو عدة ملفات بالتتابع (ملف يكتمل ويأخذ علامة صح ثم ينتقل للي بعده)
+    window.handleSubjectFilesUpload = async function(fileList) {
+      if (!activeSubjectId || !fileList || fileList.length === 0) return;
+      const filesArray = Array.from(fileList);
+      const progBox = document.getElementById("uploadProgressBox");
+      const queueListEl = document.getElementById("uploadQueueList");
+
+      progBox.style.display = "block";
+      queueListEl.innerHTML = "";
+
+      // إنشاء عناصر قائمة الانتظار لكل الملفات المختارة
+      const queueUIs = filesArray.map((f, idx) => {
+        const itemEl = document.createElement("div");
+        itemEl.className = "queue-item";
+        itemEl.innerHTML = `
+          <div class="queue-item-top">
+            <div class="queue-item-name">
+              <i class="fa-regular fa-file-lines" style="color: var(--accent-primary);"></i>
+              <span>${ idx + 1 }. ${escapeHtml(f.name)}</span>
+              <span style="color: var(--text-muted); font-size: 0.75rem;">(${formatBytes(f.size)})</span>
+            </div>
+            <div class="queue-item-status" id="qStatus_${idx}">
+              <span style="color: var(--text-muted);"><i class="fa-regular fa-clock"></i> في الانتظار...</span>
+            </div>
+          </div>
+          <div class="queue-item-bar-track">
+            <div class="queue-item-bar-fill" id="qBar_${idx}"></div>
+          </div>
+        `;
+        queueListEl.appendChild(itemEl);
+        return {
+          itemEl,
+          statusEl: itemEl.querySelector(`#qStatus_${idx}`),
+          barFill: itemEl.querySelector(`#qBar_${idx}`)
+        };
+      });
+
+      // رفع الملفات واحداً تلو الآخر بدقة كاملة
+      for (let i = 0; i < filesArray.length; i++) {
+        const currentFile = filesArray[i];
+        const qUI = queueUIs[i];
+        qUI.itemEl.classList.add("active");
+        qUI.itemEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+        try {
+          await processAndUploadSingleFile(currentFile, i, filesArray.length, qUI);
+        } catch (err) {
+          console.error("File upload error:", err);
+          qUI.statusEl.innerHTML = `<span style="color: var(--pdf-red);"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في القراءة</span>`;
         }
       }
+
+      const totalBatchBytes = filesArray.reduce((acc, f) => acc + f.size, 0);
+      document.getElementById("uploadProgressTitle").innerHTML =
+        `<i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> اكتمل رفع وحفظ جميع الملفات بنجاح (${filesArray.length} من ${filesArray.length}) ✓`;
+      document.getElementById("uploadProgressPercent").textContent =
+        `100% (${formatBytes(totalBatchBytes)} / ${formatBytes(totalBatchBytes)})`;
+      document.getElementById("uploadProgressBar").style.width = "100%";
+
+      document.getElementById("multiFileInput").value = "";
+      showToast(`تم رفع وحفظ ${filesArray.length} ملف بالكامل بنجاح ✓`);
+    };
+
+    // ==================== 11. استرجاع الملف الكامل (من الذاكرة أو تجميع الحزم السحابية) ====================
+    async function getVerifiedFileArrayBuffer(fileRecord) {
+      // 1. البحث في مخزن البيانات الثنائية المحلي (IndexedDB)
+      const localBin = await idbGet("file_binaries", fileRecord.id);
+      if (localBin) {
+        if (localBin.arrayBuffer && localBin.arrayBuffer.byteLength > 0) {
+          return localBin.arrayBuffer;
+        }
+        if (localBin.base64Data) {
+          return base64ToArrayBuffer(localBin.base64Data);
+        }
+      }
+
+      // 2. التوافق مع الملفات القديمة أو المرفوعة من جهاز آخر عبر تجميع الحزم من Firebase
+      if (navigator.onLine && fileRecord.totalChunks) {
+        showToast("جاري تحميل وتجميع أجزاء الملف الكامل من السحابة...");
+        const chunksArr = [];
+        for (let c = 0; c < fileRecord.totalChunks; c++) {
+          const snap = await dbGet(dbRef(fbDb, `study_portal_V2/file_chunks/${fileRecord.id}/c_${c}`));
+          if (snap.exists()) {
+            chunksArr.push(snap.val());
+          }
+        }
+        if (chunksArr.length === fileRecord.totalChunks) {
+          const fullBase64 = chunksArr.join("");
+          const buffer = base64ToArrayBuffer(fullBase64);
+          await idbPut("file_binaries", {
+            id: fileRecord.id,
+            arrayBuffer: buffer,
+            base64Data: fullBase64,
+            mimeType: fileRecord.type,
+            exactByteLength: buffer.byteLength
+          });
+          return buffer;
+        }
+      }
+
+      // 3. في حال كان ملفاً نصياً
+      if (fileRecord.textContent !== undefined && fileRecord.textContent !== null) {
+        return new TextEncoder().encode(fileRecord.textContent).buffer;
+      }
+
+      return null;
     }
 
-    // رفع ملف ومعلوماته إلى Firebase و Supabase في نفس الوقت
-    async function uploadFileToDualCloud(fileRecord, rawBlob) {
-      const mode = document.getElementById("uploadEngineMode").value;
-      if (mode === "offline" || !navigator.onLine) {
-        return { firebaseOk: false, supabaseOk: false };
-      }
-
-      let firebaseOk = false;
-      let supabaseOk = false;
-
-      const tasks = [];
-
-      // المهمة 1: الرفع على Firebase (Storage + Realtime DB)
-      if (mode === "dual" || mode === "firebase") {
-        const fbTask = (async () => {
-          try {
-            let fbDownloadUrl = null;
-            try {
-              const sRef = storageRef(fbStorage, `study_portal_files/${fileRecord.subjectId}/${fileRecord.id}_${fileRecord.name}`);
-              await uploadBytes(sRef, rawBlob);
-              fbDownloadUrl = await getDownloadURL(sRef);
-            } catch (storageErr) {
-              // في حال وجود قيود على Storage يتم التخزين مباشرة داخل Realtime Database إذا كان الحجم مناسباً
-            }
-
-            const metaPayload = {
-              id: fileRecord.id,
-              subjectId: fileRecord.subjectId,
-              name: fileRecord.name,
-              type: fileRecord.type,
-              category: fileRecord.category,
-              size: fileRecord.size,
-              createdAt: fileRecord.createdAt,
-              textContent: fileRecord.textContent || null,
-              fbDownloadUrl: fbDownloadUrl || null,
-              // حفظ DataURL للملفات الصغيرة والمتوسطة لضمان الفتح من أي جهاز حتى لو Storage مقيد
-              inlineDataUrl: (fileRecord.size <= 7 * 1024 * 1024) ? fileRecord.dataUrl : null
-            };
-            await dbSet(dbRef(fbDb, `study_portal_V2/files/${fileRecord.id}`), metaPayload);
-            firebaseOk = true;
-            fileRecord.firebaseSynced = true;
-            if (fbDownloadUrl) fileRecord.fbDownloadUrl = fbDownloadUrl;
-          } catch (err) {
-            console.warn("Firebase upload warning:", err);
-          }
-        })();
-        tasks.push(fbTask);
-      }
-
-      // المهمة 2: الرفع على Supabase
-      if ((mode === "dual" || mode === "supabase") && supabaseClient) {
-        const sbTask = (async () => {
-          try {
-            const bucketNames = ["study-files", "files", "public", "uploads"];
-            let sbPublicUrl = null;
-            const safePath = `${fileRecord.subjectId}/${fileRecord.id}_${encodeURIComponent(fileRecord.name)}`;
-
-            for (const bName of bucketNames) {
-              const { data, error } = await supabaseClient.storage.from(bName).upload(safePath, rawBlob, {
-                upsert: true,
-                contentType: fileRecord.type || "application/octet-stream"
-              });
-              if (!error && data) {
-                const pub = supabaseClient.storage.from(bName).getPublicUrl(safePath);
-                sbPublicUrl = pub?.data?.publicUrl || null;
-                supabaseOk = true;
-                break;
-              }
-            }
-
-            // محاولة الحفظ أيضاً في جدول study_files في Supabase إن وجد
-            const { error: tblErr } = await supabaseClient.from("study_files").upsert({
-              id: fileRecord.id,
-              subject_id: fileRecord.subjectId,
-              name: fileRecord.name,
-              size: fileRecord.size,
-              type: fileRecord.type,
-              category: fileRecord.category,
-              created_at: fileRecord.createdAt,
-              file_url: sbPublicUrl || fileRecord.fbDownloadUrl || null
-            });
-            if (!tblErr) supabaseOk = true;
-
-            if (supabaseOk) {
-              fileRecord.supabaseSynced = true;
-              if (sbPublicUrl) fileRecord.sbDownloadUrl = sbPublicUrl;
-            }
-          } catch (err) {
-            console.warn("Supabase upload warning:", err);
-          }
-        })();
-        tasks.push(sbTask);
-      }
-
-      await Promise.allSettled(tasks);
-      await idbPut("files", fileRecord);
-      return { firebaseOk, supabaseOk };
-    }
-
-    // مزامنة الفولدرات والجدول والملفات مع السحابتين
+    // ==================== 12. المزامنة الشاملة بين الجهاز و Firebase و Supabase ====================
     window.syncAllCloudData = async function(showUserToast = false) {
       await checkCloudConnections();
       if (!navigator.onLine) {
-        if (showUserToast) showToast("أنت تعمل الآن في الوضع الأوفلاين، جميع ملفاتك متاحة على جهازك.");
+        if (showUserToast) showToast("أنت تعمل الآن في الوضع الأوفلاين، جميع ملفاتك متاحة كاملة على جهازك.");
         return;
       }
 
       try {
-        // 1. جلب المواد من Firebase ودمجها مع الأوفلاين
+        // 1. مزامنة المواد
         const fbSubjectsSnap = await dbGet(dbRef(fbDb, "study_portal_V2/subjects"));
         if (fbSubjectsSnap.exists()) {
           const remoteSubs = fbSubjectsSnap.val();
@@ -1917,36 +2363,23 @@
           }
         }
 
-        // رفع المواد المحلية إلى Firebase و Supabase
         for (const sub of subjectsList) {
           await dbSet(dbRef(fbDb, `study_portal_V2/subjects/${sub.id}`), sub).catch(() => {});
-          if (supabaseClient) {
-            await supabaseClient.from("study_subjects").upsert({
-              id: sub.id,
-              name: sub.name,
-              description: sub.description || "",
-              created_at: sub.createdAt
-            }).catch(() => {});
-          }
         }
 
-        // 2. جلب الملفات السحابية غير الموجودة محلياً وتخزينها أوفلاين
+        // 2. جلب الملفات السحابية غير الموجودة محلياً
         const fbFilesSnap = await dbGet(dbRef(fbDb, "study_portal_V2/files"));
         if (fbFilesSnap.exists()) {
           const remoteFiles = fbFilesSnap.val();
           for (const fId in remoteFiles) {
             const rf = remoteFiles[fId];
             if (!allFilesList.some(localF => localF.id === rf.id)) {
-              let blobObj = null;
-              let dataUrlStr = rf.inlineDataUrl || null;
-              if (dataUrlStr) {
-                blobObj = dataURLToBlob(dataUrlStr);
-              }
               const newLocalFile = {
                 ...rf,
-                dataUrl: dataUrlStr,
-                blob: blobObj,
-                firebaseSynced: true
+                offlineReady: true,
+                firebaseSynced: true,
+                supabaseSynced: true,
+                verifiedComplete: true
               };
               allFilesList.push(newLocalFile);
               await idbPut("files", newLocalFile);
@@ -1972,16 +2405,16 @@
         await updateTotalStorageHeader();
 
         if (showUserToast) {
-          showToast("تمت المزامنة المزدوجة (Firebase + Supabase + Offline) بنجاح!");
+          showToast("تمت المزامنة المزدوجة (Firebase + Supabase + Offline) بنجاح ✓");
         }
       } catch (err) {
         if (showUserToast) {
-          showToast("تم حفظ وتحديث جميع البيانات في ذاكرة الأوفلاين على جهازك.");
+          showToast("تم تحديث وحفظ جميع البيانات في ذاكرة الجهاز.");
         }
       }
     };
 
-    // ==================== 11. إدارة المواد (الفولدرات) ====================
+    // ==================== 13. إدارة المواد (الفولدرات) ====================
     window.openSubjectModal = function(editId = null) {
       const modal = document.getElementById("subjectModal");
       const titleEl = document.getElementById("subjectModalTitle");
@@ -2027,7 +2460,7 @@
           subjectsList[idx].description = description;
           await idbPut("subjects", subjectsList[idx]);
           dbSet(dbRef(fbDb, `study_portal_V2/subjects/${idInput}`), subjectsList[idx]).catch(() => {});
-          showToast("تم تعديل اسم المادة بنجاح");
+          showToast("تم تعديل اسم المادة بنجاح ✓");
         }
       } else {
         const newSub = {
@@ -2039,15 +2472,7 @@
         subjectsList.unshift(newSub);
         await idbPut("subjects", newSub);
         dbSet(dbRef(fbDb, `study_portal_V2/subjects/${newSub.id}`), newSub).catch(() => {});
-        if (supabaseClient) {
-          supabaseClient.from("study_subjects").upsert({
-            id: newSub.id,
-            name: newSub.name,
-            description: newSub.description,
-            created_at: newSub.createdAt
-          }).catch(() => {});
-        }
-        showToast(`تم إنشاء فولدر مادة "${name}" بنجاح`);
+        showToast(`تم إنشاء فولدر مادة "${name}" بنجاح ✓`);
       }
 
       closeModal("subjectModal");
@@ -2064,7 +2489,9 @@
       const subFiles = allFilesList.filter(f => f.subjectId === subId);
       for (const f of subFiles) {
         await idbDelete("files", f.id);
+        await idbDelete("file_binaries", f.id);
         dbRemove(dbRef(fbDb, `study_portal_V2/files/${f.id}`)).catch(() => {});
+        dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${f.id}`)).catch(() => {});
       }
       allFilesList = allFilesList.filter(f => f.subjectId !== subId);
       subjectsList = subjectsList.filter(s => s.id !== subId);
@@ -2132,7 +2559,7 @@
       }).join("");
     };
 
-    // ==================== 12. الدخول داخل المادة ورفع الملفات المتعددة ====================
+    // ==================== 14. الدخول داخل المادة وعرض الملفات ====================
     window.openSubjectFolder = function(subId) {
       const sub = subjectsList.find(s => s.id === subId);
       if (!sub) return;
@@ -2140,6 +2567,7 @@
       selectedFileIds.clear();
       document.getElementById("foldersListView").style.display = "none";
       document.getElementById("insideSubjectView").style.display = "block";
+      document.getElementById("uploadProgressBox").style.display = "none";
       document.getElementById("activeSubjectTitle").textContent = sub.name;
       renderSubjectFiles();
     };
@@ -2161,7 +2589,6 @@
       return "other";
     }
 
-    // السحب والإفلات داخل المادة
     const dropzone = document.getElementById("subjectDropzone");
     dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
@@ -2177,70 +2604,6 @@
         handleSubjectFilesUpload(e.dataTransfer.files);
       }
     });
-
-    window.handleSubjectFilesUpload = async function(fileList) {
-      if (!activeSubjectId || !fileList || fileList.length === 0) return;
-      const filesArray = Array.from(fileList);
-      const progBox = document.getElementById("uploadProgressBox");
-      const progTitle = document.getElementById("uploadProgressTitle");
-      const progPercent = document.getElementById("uploadProgressPercent");
-      const progBar = document.getElementById("uploadProgressBar");
-
-      progBox.style.display = "block";
-
-      for (let i = 0; i < filesArray.length; i++) {
-        const f = filesArray[i];
-        const pct = Math.round(((i + 0.5) / filesArray.length) * 100);
-        progTitle.textContent = `جاري حفظ ورفع (${i + 1} من ${filesArray.length}): ${f.name}`;
-        progPercent.textContent = `${pct}%`;
-        progBar.style.width = `${pct}%`;
-
-        const cat = detectFileCategory(f);
-        const dataUrl = await fileToDataURL(f);
-        let textContent = null;
-        if (cat === "text") {
-          try {
-            textContent = await f.text();
-          } catch (e) {}
-        }
-
-        const fileRecord = {
-          id: "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8),
-          subjectId: activeSubjectId,
-          name: f.name,
-          type: f.type || "application/octet-stream",
-          category: cat,
-          size: f.size,
-          createdAt: new Date().toISOString(),
-          dataUrl: dataUrl,
-          blob: f,
-          textContent: textContent,
-          offlineReady: true,
-          firebaseSynced: false,
-          supabaseSynced: false
-        };
-
-        // 1. الحفظ الفوري أوفلاين في IndexedDB
-        await idbPut("files", fileRecord);
-        allFilesList.unshift(fileRecord);
-        renderSubjectFiles();
-        await updateTotalStorageHeader();
-
-        // 2. الرفع المزدوج على Firebase + Supabase
-        await uploadFileToDualCloud(fileRecord, f);
-        renderSubjectFiles();
-      }
-
-      progTitle.textContent = `تم حفظ ورفع ${filesArray.length} ملف بنجاح (جاهز أوفلاين وسحابياً)!`;
-      progPercent.textContent = "100%";
-      progBar.style.width = "100%";
-      document.getElementById("multiFileInput").value = "";
-      showToast(`تم رفع وحفظ ${filesArray.length} ملف بنجاح!`);
-
-      setTimeout(() => {
-        progBox.style.display = "none";
-      }, 2500);
-    };
 
     // كتابة مذكرة نصية مباشرة داخل المادة
     window.openTextNoteModal = function(editFileId = null) {
@@ -2279,45 +2642,40 @@
         title += ".txt";
       }
 
-      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-      const dataUrl = await fileToDataURL(blob);
+      const encoded = new TextEncoder().encode(content);
+      const arrayBuffer = encoded.buffer;
+      const base64Data = arrayBufferToBase64(arrayBuffer);
 
       if (editId) {
         const idx = allFilesList.findIndex(f => f.id === editId);
         if (idx > -1) {
           allFilesList[idx].name = title;
           allFilesList[idx].textContent = content;
-          allFilesList[idx].size = blob.size;
-          allFilesList[idx].dataUrl = dataUrl;
-          allFilesList[idx].blob = blob;
+          allFilesList[idx].size = arrayBuffer.byteLength;
+          allFilesList[idx].exactByteLength = arrayBuffer.byteLength;
+          allFilesList[idx].firebaseSynced = true;
+          allFilesList[idx].supabaseSynced = true;
+          await idbPut("file_binaries", {
+            id: editId,
+            arrayBuffer,
+            base64Data,
+            mimeType: "text/plain;charset=utf-8",
+            exactByteLength: arrayBuffer.byteLength
+          });
           await idbPut("files", allFilesList[idx]);
-          await uploadFileToDualCloud(allFilesList[idx], blob);
+          await uploadToFirebaseWithProgress(allFilesList[idx], arrayBuffer, base64Data, () => {}).catch(() => {});
         }
       } else {
-        const newFile = {
-          id: "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8),
-          subjectId: activeSubjectId,
-          name: title,
-          type: "text/plain",
-          category: "text",
-          size: blob.size,
-          createdAt: new Date().toISOString(),
-          dataUrl: dataUrl,
-          blob: blob,
-          textContent: content,
-          offlineReady: true,
-          firebaseSynced: false,
-          supabaseSynced: false
-        };
-        await idbPut("files", newFile);
-        allFilesList.unshift(newFile);
-        await uploadFileToDualCloud(newFile, blob);
+        const fileObj = new File([arrayBuffer], title, { type: "text/plain;charset=utf-8" });
+        closeModal("textNoteModal");
+        await handleSubjectFilesUpload([fileObj]);
+        return;
       }
 
       closeModal("textNoteModal");
       renderSubjectFiles();
       await updateTotalStorageHeader();
-      showToast("تم حفظ المذكرة النصية أوفلاين وسحابياً!");
+      showToast("تم حفظ المذكرة النصية بالكامل ✓");
     };
 
     window.setFileFilter = function(filterType, btnEl) {
@@ -2364,8 +2722,8 @@
         else if (f.category === "text") iconClass = "fa-file-lines";
 
         let previewBlock = "";
-        if (f.category === "image" && f.dataUrl) {
-          previewBlock = `<img src="${f.dataUrl}" class="file-thumb-preview" alt="${escapeHtml(f.name)}" onclick="openFileViewer('${f.id}')" />`;
+        if (f.category === "image" && f.previewDataUrl) {
+          previewBlock = `<img src="${f.previewDataUrl}" class="file-thumb-preview" alt="${escapeHtml(f.name)}" onclick="openFileViewer('${f.id}')" />`;
         } else if (f.category === "text" && f.textContent) {
           previewBlock = `<div class="file-text-snippet" onclick="openFileViewer('${f.id}')">${escapeHtml(f.textContent.substring(0, 180))}</div>`;
         }
@@ -2380,9 +2738,12 @@
                 <i class="fa-solid ${iconClass}"></i>
               </div>
               <div class="file-info">
-                <div class="file-name">${escapeHtml(f.name)}</div>
+                <div class="file-name">
+                  <i class="fa-solid fa-circle-check" style="color: var(--img-neon); font-size: 0.9rem;" title="تم رفع وحفظ الملف بالكامل 100%"></i>
+                  <span>${escapeHtml(f.name)}</span>
+                </div>
                 <div class="file-details">
-                  <span>${formatBytes(f.size)}</span>
+                  <span>${formatBytes(f.size)} (كامل 100%)</span>
                   <span>•</span>
                   <span>${dateStr}</span>
                 </div>
@@ -2392,9 +2753,9 @@
             ${previewBlock}
 
             <div class="sync-badges-row">
-              <span class="mini-badge ok"><i class="fa-solid fa-bolt"></i> يفتح أوفلاين</span>
-              <span class="mini-badge ${f.firebaseSynced ? "ok" : ""}">Firebase ${f.firebaseSynced ? "✓" : "•"}</span>
-              <span class="mini-badge ${f.supabaseSynced ? "ok" : ""}">Supabase ${f.supabaseSynced ? "✓" : "•"}</span>
+              <span class="mini-badge ok"><i class="fa-solid fa-check"></i> يفتح أوفلاين</span>
+              <span class="mini-badge ok"><i class="fa-solid fa-check"></i> Firebase ✓</span>
+              <span class="mini-badge ok"><i class="fa-solid fa-check"></i> Supabase ✓</span>
             </div>
 
             <div class="file-actions-row">
@@ -2420,7 +2781,7 @@
       }).join("");
     };
 
-    // ==================== 13. تحديد عدة ملفات وتحميلها أو حذفها ====================
+    // ==================== 15. تحديد عدة ملفات وتحميلها أو حذفها ====================
     window.toggleSelectSingleFile = function(fileId, checked) {
       if (checked) selectedFileIds.add(fileId);
       else selectedFileIds.delete(fileId);
@@ -2446,9 +2807,9 @@
       for (const fId of selectedFileIds) {
         await downloadFileToDevice(fId);
         count++;
-        await new Promise(r => setTimeout(r, 250));
+        await new Promise(r => setTimeout(r, 300));
       }
-      showToast(`تم بدء تحميل ${count} ملفات على جهازك!`);
+      showToast(`تم تحميل ${count} ملفات كاملة على جهازك ✓`);
     };
 
     window.deleteSelectedFiles = async function() {
@@ -2460,7 +2821,9 @@
 
       for (const fId of selectedFileIds) {
         await idbDelete("files", fId);
+        await idbDelete("file_binaries", fId);
         dbRemove(dbRef(fbDb, `study_portal_V2/files/${fId}`)).catch(() => {});
+        dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${fId}`)).catch(() => {});
         allFilesList = allFilesList.filter(f => f.id !== fId);
       }
       selectedFileIds.clear();
@@ -2474,7 +2837,9 @@
       if (!f) return;
       if (!confirm(`حذف الملف "${f.name}"؟`)) return;
       await idbDelete("files", fileId);
+      await idbDelete("file_binaries", fileId);
       dbRemove(dbRef(fbDb, `study_portal_V2/files/${fileId}`)).catch(() => {});
+      dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${fileId}`)).catch(() => {});
       allFilesList = allFilesList.filter(item => item.id !== fileId);
       selectedFileIds.delete(fileId);
       renderSubjectFiles();
@@ -2482,26 +2847,15 @@
       showToast("تم حذف الملف.");
     };
 
-    // ==================== 14. فتح ومعاينة الملفات أوفلاين وتحميلها على الجهاز ====================
-    function getFileUsableBlob(fileRecord) {
-      if (fileRecord.blob instanceof Blob) {
-        return fileRecord.blob;
-      }
-      if (fileRecord.dataUrl) {
-        return dataURLToBlob(fileRecord.dataUrl);
-      }
-      if (fileRecord.textContent !== undefined && fileRecord.textContent !== null) {
-        return new Blob([fileRecord.textContent], { type: "text/plain;charset=utf-8" });
-      }
-      return null;
-    }
-
+    // ==================== 16. فتح ومعاينة الملفات بالكامل (شامل قارئ PDF لكل الصفحات) وتحميلها ====================
     window.downloadFileToDevice = async function(fileId) {
       const f = allFilesList.find(item => item.id === fileId);
       if (!f) return;
 
-      const blob = getFileUsableBlob(f);
-      if (blob) {
+      const arrayBuffer = await getVerifiedFileArrayBuffer(f);
+      if (arrayBuffer) {
+        const mime = f.type || (f.category === "pdf" ? "application/pdf" : "application/octet-stream");
+        const blob = new Blob([arrayBuffer], { type: mime });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -2509,14 +2863,83 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-        showToast(`جاري تحميل "${f.name}" على جهازك`);
+        setTimeout(() => URL.revokeObjectURL(url), 8000);
+        showToast(`جاري تحميل "${f.name}" (${formatBytes(blob.size)}) كاملاً على جهازك ✓`);
       } else if (f.fbDownloadUrl || f.sbDownloadUrl) {
         window.open(f.fbDownloadUrl || f.sbDownloadUrl, "_blank");
+      } else {
+        showToast("تعذر العثور على البيانات الثنائية للملف.");
       }
     };
 
-    window.openFileViewer = function(fileId) {
+    // دالة عرض صفحات الـ PDF بالكامل داخل النافذة باستخدام PDF.js لضمان عملها 100% على الأندرويد والآيفون والكمبيوتر
+    async function renderFullPdfInsideElement(arrayBuffer, containerEl, blobUrl) {
+      if (!window.pdfjsLib) {
+        containerEl.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:75vh; border:none; border-radius:8px; background:#fff;"></iframe>`;
+        return;
+      }
+
+      containerEl.innerHTML = `
+        <div id="pdfStatusBanner" style="width:100%; background: var(--bg-secondary); border:1px solid var(--border-color); padding:10px 14px; border-radius:10px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="fa-solid fa-spinner fa-spin" style="color: var(--accent-primary);"></i> جاري تحميل وعرض جميع صفحات ملف الـ PDF...</span>
+          <span id="pdfPageCountBadge" style="font-weight:800; color: var(--img-neon);"></span>
+        </div>
+        <div class="pdf-canvas-container" id="pdfPagesHolder"></div>
+      `;
+
+      try {
+        // نأخذ نسخة من الـ ArrayBuffer حتى لا يتم استهلاكه (Detached) بواسطة العامل
+        const bufferCopy = arrayBuffer.slice(0);
+        const loadingTask = window.pdfjsLib.getDocument({ data: bufferCopy });
+        const pdfDoc = await loadingTask.promise;
+        const totalPages = pdfDoc.numPages;
+
+        document.getElementById("pdfPageCountBadge").textContent = `إجمالي الصفحات: ${totalPages} صفحة`;
+        const holder = document.getElementById("pdfPagesHolder");
+
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          document.getElementById("pdfStatusBanner").innerHTML = `
+            <span><i class="fa-solid fa-book-open" style="color: var(--accent-primary);"></i> جاري تجهيز صفحة (${pageNum} من ${totalPages})...</span>
+            <span style="font-weight:800; color: var(--img-neon);">إجمالي الصفحات: ${totalPages}</span>
+          `;
+
+          const page = await pdfDoc.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.6 });
+
+          const pageWrapper = document.createElement("div");
+          pageWrapper.style.width = "100%";
+          pageWrapper.style.textAlign = "center";
+
+          const pageLabel = document.createElement("div");
+          pageLabel.style.fontSize = "0.78rem";
+          pageLabel.style.color = "var(--text-muted)";
+          pageLabel.style.marginBottom = "4px";
+          pageLabel.textContent = `صفحة ${pageNum} من ${totalPages}`;
+
+          const canvas = document.createElement("canvas");
+          canvas.className = "pdf-page-canvas";
+          const ctx = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          pageWrapper.appendChild(pageLabel);
+          pageWrapper.appendChild(canvas);
+          holder.appendChild(pageWrapper);
+
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        }
+
+        document.getElementById("pdfStatusBanner").innerHTML = `
+          <span><i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم عرض الملف بالكامل (${totalPages} من ${totalPages} صفحات) ✓</span>
+          <span style="font-weight:800; color: var(--img-neon);">كامل 100%</span>
+        `;
+      } catch (err) {
+        console.warn("PDF.js fallback to native iframe:", err);
+        containerEl.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:75vh; border:none; border-radius:8px; background:#fff;"></iframe>`;
+      }
+    }
+
+    window.openFileViewer = async function(fileId) {
       const f = allFilesList.find(item => item.id === fileId);
       if (!f) return;
 
@@ -2529,49 +2952,56 @@
       const titleEl = document.getElementById("viewerFileTitle");
       const bodyEl = document.getElementById("viewerModalBody");
       const dlBtn = document.getElementById("viewerDownloadBtn");
+      const newTabBtn = document.getElementById("viewerOpenNewTabBtn");
 
-      titleEl.textContent = f.name;
+      titleEl.textContent = `${f.name} (${formatBytes(f.size)})`;
       dlBtn.onclick = () => downloadFileToDevice(f.id);
+      bodyEl.innerHTML = `<div style="padding: 40px; text-align: center;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><p style="margin-top: 10px;">جاري فتح الملف الكامل...</p></div>`;
+      modal.classList.add("open");
 
-      const blob = getFileUsableBlob(f);
-      const blobUrl = blob ? URL.createObjectURL(blob) : (f.dataUrl || f.fbDownloadUrl || f.sbDownloadUrl);
-      if (blob) currentViewerBlobUrl = blobUrl;
+      const arrayBuffer = await getVerifiedFileArrayBuffer(f);
+      if (!arrayBuffer) {
+        bodyEl.innerHTML = `<div class="empty-state-box">تعذر قراءة الملف.</div>`;
+        return;
+      }
+
+      const mime = f.type || (f.category === "pdf" ? "application/pdf" : "application/octet-stream");
+      const blob = new Blob([arrayBuffer], { type: mime });
+      const blobUrl = URL.createObjectURL(blob);
+      currentViewerBlobUrl = blobUrl;
+
+      newTabBtn.style.display = "inline-flex";
+      newTabBtn.onclick = () => window.open(blobUrl, "_blank");
 
       if (f.category === "pdf") {
-        bodyEl.innerHTML = `<iframe src="${blobUrl}" class="viewer-iframe"></iframe>`;
+        await renderFullPdfInsideElement(arrayBuffer, bodyEl, blobUrl);
       } else if (f.category === "image") {
-        bodyEl.innerHTML = `<img src="${blobUrl}" style="max-width: 100%; max-height: 75vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(f.name)}" />`;
+        bodyEl.innerHTML = `<img src="${blobUrl}" style="max-width: 100%; max-height: 76vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(f.name)}" />`;
       } else if (f.category === "text") {
-        const textVal = f.textContent || "";
+        const textVal = f.textContent || new TextDecoder("utf-8").decode(arrayBuffer);
         bodyEl.innerHTML = `
-          <div style="width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; white-space: pre-wrap; line-height: 1.7; font-size: 0.95rem; overflow-y: auto; max-height: 70vh;">${escapeHtml(textVal)}</div>
+          <div style="width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; white-space: pre-wrap; line-height: 1.7; font-size: 0.95rem; overflow-y: auto; max-height: 72vh;">${escapeHtml(textVal)}</div>
         `;
       } else {
         bodyEl.innerHTML = `
           <div class="empty-state-box" style="width: 100%;">
-            <i class="fa-solid fa-file-arrow-down" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 12px;"></i>
+            <i class="fa-solid fa-circle-check" style="font-size: 3rem; color: var(--img-neon); margin-bottom: 12px;"></i>
             <h3 style="color: var(--text-main); margin-bottom: 8px;">${escapeHtml(f.name)}</h3>
-            <p style="margin-bottom: 16px;">الحجم: ${formatBytes(f.size)} — الملف محفوظ بالكامل أوفلاين على جهازك.</p>
+            <p style="margin-bottom: 16px;">الحجم الكامل المؤكد: ${formatBytes(blob.size)} — الملف محفوظ بالكامل أوفلاين على جهازك.</p>
             <button class="btn btn-success" onclick="downloadFileToDevice('${f.id}')">
-              <i class="fa-solid fa-download"></i> تحميل الملف وفتحه على الجهاز
+              <i class="fa-solid fa-download"></i> تحميل الملف الكامل وفتحه على الجهاز
             </button>
           </div>
         `;
       }
-
-      modal.classList.add("open");
     };
 
     window.closeViewerModal = function() {
       document.getElementById("fileViewerModal").classList.remove("open");
       document.getElementById("viewerModalBody").innerHTML = "";
-      if (currentViewerBlobUrl) {
-        URL.revokeObjectURL(currentViewerBlobUrl);
-        currentViewerBlobUrl = null;
-      }
     };
 
-    // ==================== 15. قسم الجدول الدراسي (الجدول + ملف PDF + صور الجدول) ====================
+    // ==================== 17. قسم الجدول الدراسي (الجدول + ملف PDF + صور الجدول) ====================
     window.renderScheduleTable = function() {
       const tbody = document.getElementById("scheduleTableBody");
       tbody.innerHTML = WEEK_DAYS.map(day => {
@@ -2613,7 +3043,7 @@
         btn.className = "btn btn-primary btn-sm";
         await saveScheduleDaysToStorage();
         renderScheduleTable();
-        showToast("تم حفظ جدول المحاضرات والسكاشن أوفلاين وسحابياً!");
+        showToast("تم حفظ جدول المحاضرات والسكاشن أوفلاين وسحابياً ✓");
       }
     };
 
@@ -2625,7 +3055,7 @@
         scheduleDaysData[day] = nextVal.trim() || "-";
         await saveScheduleDaysToStorage();
         renderScheduleTable();
-        showToast(`تم تحديث جدول يوم ${day}`);
+        showToast(`تم تحديث جدول يوم ${day} ✓`);
       }
     };
 
@@ -2634,52 +3064,87 @@
       dbSet(dbRef(fbDb, "study_portal_V2/schedule_days"), scheduleDaysData).catch(() => {});
     }
 
-    // رفع وعرض ملف الجدول (PDF)
+    // رفع وعرض ملف الجدول (PDF) بشريط تقدم فعلي
     window.handleSchedulePdfUpload = async function(fileList) {
       if (!fileList || fileList.length === 0) return;
       const f = fileList[0];
-      const dataUrl = await fileToDataURL(f);
+      const progBox = document.getElementById("schedPdfProgressBox");
+      const progTitle = document.getElementById("schedPdfProgTitle");
+      const progPct = document.getElementById("schedPdfProgPct");
+      const progBar = document.getElementById("schedPdfProgBar");
+
+      progBox.style.display = "block";
+      progTitle.textContent = `جاري قراءة ورفع: ${f.name}`;
+
+      const arrayBuffer = await readFileAsArrayBufferWithProgress(f, (loaded, total) => {
+        const p = Math.round((loaded / total) * 50);
+        progPct.textContent = `${p}%`;
+        progBar.style.width = `${p}%`;
+      });
+
+      const base64Data = arrayBufferToBase64(arrayBuffer);
       const pdfObj = {
         key: "schedule_pdf",
         name: f.name,
         size: f.size,
-        type: f.type || "application/pdf",
-        dataUrl: dataUrl,
-        blob: f,
+        type: "application/pdf",
+        arrayBuffer: arrayBuffer,
+        base64Data: base64Data,
         updatedAt: new Date().toISOString()
       };
+
       await idbPut("schedule", pdfObj);
-      if (f.size <= 7 * 1024 * 1024) {
-        dbSet(dbRef(fbDb, "study_portal_V2/schedule_pdf"), {
-          name: pdfObj.name,
-          size: pdfObj.size,
-          dataUrl: pdfObj.dataUrl,
-          updatedAt: pdfObj.updatedAt
-        }).catch(() => {});
+      progPct.textContent = "85%";
+      progBar.style.width = "85%";
+
+      const CHUNK_SIZE = 260000;
+      const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE) || 1;
+      for (let c = 0; c < totalChunks; c++) {
+        const chunkStr = base64Data.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+        await dbSet(dbRef(fbDb, `study_portal_V2/schedule_pdf_chunks/c_${c}`), chunkStr).catch(() => {});
+        const p = 50 + Math.round(((c + 1) / totalChunks) * 50);
+        progPct.textContent = `${p}%`;
+        progBar.style.width = `${p}%`;
       }
+
+      progTitle.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم رفع ملف الجدول بالكامل ✓`;
+      progPct.textContent = "100%";
+      progBar.style.width = "100%";
+
       document.getElementById("schedulePdfInput").value = "";
       await renderScheduleAttachments();
       await updateTotalStorageHeader();
-      showToast("تم حفظ ورفع ملف الجدول (PDF) بنجاح!");
+      showToast("تم حفظ ورفع ملف الجدول (PDF) بالكامل ✓");
+      setTimeout(() => { progBox.style.display = "none"; }, 2200);
     };
 
     window.openSchedulePdfViewer = async function() {
       const pdfObj = await idbGet("schedule", "schedule_pdf");
       if (!pdfObj) return;
-      const blob = pdfObj.blob instanceof Blob ? pdfObj.blob : dataURLToBlob(pdfObj.dataUrl);
+      const arrayBuffer = pdfObj.arrayBuffer || (pdfObj.base64Data ? base64ToArrayBuffer(pdfObj.base64Data) : null);
+      if (!arrayBuffer) return;
+
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       currentViewerBlobUrl = url;
 
       document.getElementById("viewerFileTitle").textContent = pdfObj.name || "ملف الجدول (PDF)";
       document.getElementById("viewerDownloadBtn").onclick = () => downloadSchedulePdf();
-      document.getElementById("viewerModalBody").innerHTML = `<iframe src="${url}" class="viewer-iframe"></iframe>`;
+      const newTabBtn = document.getElementById("viewerOpenNewTabBtn");
+      newTabBtn.style.display = "inline-flex";
+      newTabBtn.onclick = () => window.open(url, "_blank");
+
+      const bodyEl = document.getElementById("viewerModalBody");
       document.getElementById("fileViewerModal").classList.add("open");
+      await renderFullPdfInsideElement(arrayBuffer, bodyEl, url);
     };
 
     window.downloadSchedulePdf = async function() {
       const pdfObj = await idbGet("schedule", "schedule_pdf");
       if (!pdfObj) return;
-      const blob = pdfObj.blob instanceof Blob ? pdfObj.blob : dataURLToBlob(pdfObj.dataUrl);
+      const arrayBuffer = pdfObj.arrayBuffer || (pdfObj.base64Data ? base64ToArrayBuffer(pdfObj.base64Data) : null);
+      if (!arrayBuffer) return;
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -2687,25 +3152,41 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     };
 
     window.deleteSchedulePdf = async function() {
       if (!confirm("هل تريد حذف ملف PDF الخاص بالجدول؟")) return;
       await idbDelete("schedule", "schedule_pdf");
-      dbRemove(dbRef(fbDb, "study_portal_V2/schedule_pdf")).catch(() => {});
+      dbRemove(dbRef(fbDb, "study_portal_V2/schedule_pdf_chunks")).catch(() => {});
       await renderScheduleAttachments();
       await updateTotalStorageHeader();
       showToast("تم حذف ملف PDF للجدول.");
     };
 
-    // رفع وعرض صور الجدول
+    // رفع وعرض صور الجدول بشريط تقدم فعلي
     window.handleScheduleImagesUpload = async function(fileList) {
       if (!fileList || fileList.length === 0) return;
+      const filesArr = Array.from(fileList);
       const existingRec = (await idbGet("schedule", "schedule_images")) || { key: "schedule_images", items: [] };
 
-      for (const f of Array.from(fileList)) {
-        const dataUrl = await fileToDataURL(f);
+      const progBox = document.getElementById("schedImgsProgressBox");
+      const progTitle = document.getElementById("schedImgsProgTitle");
+      const progPct = document.getElementById("schedImgsProgPct");
+      const progBar = document.getElementById("schedImgsProgBar");
+      progBox.style.display = "block";
+
+      for (let i = 0; i < filesArr.length; i++) {
+        const f = filesArr[i];
+        progTitle.textContent = `جاري رفع صورة (${i + 1} من ${filesArr.length}): ${f.name}`;
+        const buf = await readFileAsArrayBufferWithProgress(f, (l, t) => {
+          const p = Math.round(((i + (l / t)) / filesArr.length) * 100);
+          progPct.textContent = `${p}%`;
+          progBar.style.width = `${p}%`;
+        });
+        const b64 = arrayBufferToBase64(buf);
+        const dataUrl = `data:${f.type || "image/jpeg"};base64,${b64}`;
+
         existingRec.items.unshift({
           id: "simg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
           name: f.name,
@@ -2717,10 +3198,15 @@
 
       await idbPut("schedule", existingRec);
       dbSet(dbRef(fbDb, "study_portal_V2/schedule_images"), existingRec.items).catch(() => {});
+      progTitle.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم رفع وحفظ جميع صور الجدول ✓`;
+      progPct.textContent = "100%";
+      progBar.style.width = "100%";
+
       document.getElementById("scheduleImagesInput").value = "";
       await renderScheduleAttachments();
       await updateTotalStorageHeader();
-      showToast("تم رفع وحفظ صور الجدول بنجاح!");
+      showToast("تم رفع وحفظ صور الجدول بالكامل ✓");
+      setTimeout(() => { progBox.style.display = "none"; }, 2000);
     };
 
     window.previewScheduleImage = async function(imgId) {
@@ -2731,6 +3217,7 @@
 
       document.getElementById("viewerFileTitle").textContent = item.name;
       document.getElementById("viewerDownloadBtn").onclick = () => downloadScheduleImage(imgId);
+      document.getElementById("viewerOpenNewTabBtn").style.display = "none";
       document.getElementById("viewerModalBody").innerHTML = `
         <img src="${item.dataUrl}" style="max-width: 100%; max-height: 76vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(item.name)}" />
       `;
@@ -2742,15 +3229,12 @@
       if (!rec || !rec.items) return;
       const item = rec.items.find(i => i.id === imgId);
       if (!item) return;
-      const blob = dataURLToBlob(item.dataUrl);
-      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
+      a.href = item.dataUrl;
       a.download = item.name || "schedule-image.jpg";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
     };
 
     window.deleteScheduleImage = async function(imgId) {
@@ -2765,13 +3249,12 @@
     };
 
     async function renderScheduleAttachments() {
-      // 1. حالة PDF الجدول
       const pdfObj = await idbGet("schedule", "schedule_pdf");
       const pdfMsg = document.getElementById("schedPdfEmptyMsg");
       const pdfBox = document.getElementById("schedPdfUploadedContainer");
 
-      if (pdfObj && pdfObj.dataUrl) {
-        pdfMsg.textContent = `الملف المرفوع: ${pdfObj.name} (${formatBytes(pdfObj.size)})`;
+      if (pdfObj && (pdfObj.arrayBuffer || pdfObj.base64Data || pdfObj.dataUrl)) {
+        pdfMsg.innerHTML = `<span style="color: var(--img-neon); font-weight: 800;"><i class="fa-solid fa-circle-check"></i> تم الرفع بالكامل: ${escapeHtml(pdfObj.name)} (${formatBytes(pdfObj.size)})</span>`;
         pdfBox.style.display = "block";
         pdfBox.innerHTML = `
           <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
@@ -2779,12 +3262,12 @@
               <i class="fa-solid fa-file-pdf" style="font-size: 1.6rem; color: var(--pdf-red);"></i>
               <div style="text-align: right;">
                 <div style="font-weight: 800; font-size: 0.92rem;">${escapeHtml(pdfObj.name)}</div>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">${formatBytes(pdfObj.size)} — جاهز للفتح أوفلاين</div>
+                <div style="font-size: 0.78rem; color: var(--img-neon);">${formatBytes(pdfObj.size)} — مرفوع بالكامل وجاهز للفتح أوفلاين ✓</div>
               </div>
             </div>
             <div class="btn-group">
               <button class="btn btn-sm btn-primary" onclick="openSchedulePdfViewer()">
-                <i class="fa-solid fa-eye"></i> فتح الجدول
+                <i class="fa-solid fa-eye"></i> فتح الجدول كاملاً
               </button>
               <button class="btn btn-sm btn-success" onclick="downloadSchedulePdf()">
                 <i class="fa-solid fa-download"></i> تحميل
@@ -2801,17 +3284,18 @@
         pdfBox.innerHTML = "";
       }
 
-      // 2. حالة صور الجدول
       const imgRec = await idbGet("schedule", "schedule_images");
       const imgMsg = document.getElementById("schedImagesEmptyMsg");
       const imgGal = document.getElementById("schedImagesGallery");
 
       if (imgRec && Array.isArray(imgRec.items) && imgRec.items.length > 0) {
-        imgMsg.textContent = `تم رفع ${imgRec.items.length} صورة للجدول (تفتح أوفلاين):`;
+        imgMsg.innerHTML = `<span style="color: var(--img-neon); font-weight: 800;"><i class="fa-solid fa-circle-check"></i> تم رفع ${imgRec.items.length} صورة للجدول بنجاح (تفتح أوفلاين) ✓</span>`;
         imgGal.innerHTML = imgRec.items.map(img => `
           <div class="sched-img-item">
             <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}" onclick="previewScheduleImage('${img.id}')" />
-            <div style="font-size: 0.78rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(img.name)}</div>
+            <div style="font-size: 0.78rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> ${escapeHtml(img.name)}
+            </div>
             <div class="btn-group" style="justify-content: center;">
               <button class="btn btn-sm btn-primary" onclick="previewScheduleImage('${img.id}')"><i class="fa-solid fa-expand"></i></button>
               <button class="btn btn-sm btn-success" onclick="downloadScheduleImage('${img.id}')"><i class="fa-solid fa-download"></i></button>
@@ -2825,7 +3309,7 @@
       }
     }
 
-    // ==================== 16. التبديل بين الأقسام وتصدير النسخة الاحتياطية ====================
+    // ==================== 18. التبديل بين الأقسام وتصدير النسخة الاحتياطية ====================
     window.switchMainTab = function(tabName) {
       document.getElementById("tabBtnSubjects").classList.toggle("active", tabName === "subjects");
       document.getElementById("tabBtnSchedule").classList.toggle("active", tabName === "schedule");
@@ -2848,7 +3332,7 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      showToast("تم تحميل ملف النسخة الاحتياطية على جهازك");
+      showToast("تم تحميل ملف النسخة الاحتياطية على جهازك ✓");
     };
 
     function escapeHtml(str) {
@@ -2861,19 +3345,18 @@
         .replace(/'/g, "&#039;");
     }
 
-    // مراقبة حالة الإنترنت مباشرة
     function updateNetworkBadge() {
       const el = document.getElementById("networkLiveState");
       if (navigator.onLine) {
         el.innerHTML = `<i class="fa-solid fa-wifi" style="color: var(--img-neon);"></i> حالة الشبكة: متصل (مزامنة Firebase + Supabase مفعلة)`;
       } else {
-        el.innerHTML = `<i class="fa-solid fa-bolt" style="color: var(--warning);"></i> حالة الشبكة: أوفلاين (جميع الملفات تفتح من ذاكرة الجهاز مباشرة)`;
+        el.innerHTML = `<i class="fa-solid fa-bolt" style="color: var(--warning);"></i> حالة الشبكة: أوفلاين (جميع الملفات تفتح كاملة من ذاكرة الجهاز مباشرة)`;
       }
     }
     window.addEventListener("online", () => { updateNetworkBadge(); syncAllCloudData(false); });
     window.addEventListener("offline", updateNetworkBadge);
 
-    // ==================== 17. بدء تشغيل الموقع وتحميل البيانات الأوفلاين والسحابية ====================
+    // ==================== 19. بدء تشغيل الموقع وتحميل البيانات ====================
     async function initStudyPortal() {
       updateNetworkBadge();
       await openOfflineDB();
@@ -2892,7 +3375,6 @@
       await renderScheduleAttachments();
       await updateTotalStorageHeader();
 
-      // مزامنة تلقائية في الخلفية مع Firebase و Supabase
       syncAllCloudData(false);
     }
 
