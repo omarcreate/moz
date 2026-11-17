@@ -492,6 +492,17 @@
       border-color: var(--img-neon);
     }
 
+    .btn-warning {
+      background: rgba(210, 153, 34, 0.18);
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+
+    .btn-warning:hover {
+      background: var(--warning);
+      color: #000;
+    }
+
     .btn-danger {
       background: rgba(248, 81, 73, 0.14);
       color: var(--pdf-red);
@@ -538,6 +549,15 @@
       box-shadow: var(--shadow);
     }
 
+    .folder-card.subfolder-variant {
+      border-style: solid;
+      border-right: 4px solid var(--warning);
+    }
+
+    .folder-card.subfolder-variant:hover {
+      border-color: var(--warning);
+    }
+
     .folder-top {
       display: flex;
       align-items: flex-start;
@@ -562,6 +582,11 @@
       justify-content: center;
       font-size: 1.5rem;
       flex-shrink: 0;
+    }
+
+    .folder-icon.sub-icon {
+      background: rgba(210, 153, 34, 0.16);
+      color: var(--warning);
     }
 
     .folder-title {
@@ -592,13 +617,84 @@
       gap: 6px;
     }
 
+    /* ==================== مسار التنقل (Breadcrumbs) والفولدرات الفرعية داخل المادة ==================== */
+    .breadcrumb-bar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .breadcrumb-item {
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.18s ease;
+    }
+
+    .breadcrumb-item:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .breadcrumb-item.current {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      background: rgba(88, 166, 255, 0.12);
+      cursor: default;
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .subfolders-section-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 18px;
+    }
+
+    .subfolders-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .subfolders-header-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     /* ==================== داخل المادة (رفع وتصفح الملفات) ==================== */
     .subject-inside-header {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 14px;
       padding: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -1242,16 +1338,32 @@
     }
   </style>
 
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="manifest" href="./manifest.json?v=v1794648310928">
+  <meta name="theme-color" content="#ff00ff">
+  <link rel="apple-touch-icon" href="./icon-192.png?v=v1794648310928">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=v1794648310928')
+          .then(reg => console.log('SW Registered'))
+          .catch(err => console.log('SW Failed', err));
+      });
+    }
+  </script>
+
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="manifest" href="./manifest.json?v=v1794648310928">
-    <meta name="theme-color" content="#ff00ff">
-    <link rel="apple-touch-icon" href="./icon-192.png?v=v1794648310928">
+    <link rel="manifest" href="./manifest.json?v=v1794874399356">
+    <meta name="theme-color" content="#b57daf">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=v1794874399356">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=v1794648310928')
+          navigator.serviceWorker.register('./sw.js?v=v1794874399356')
             .then(reg => console.log('SW Registered'))
             .catch(err => console.log('SW Failed', err));
         });
@@ -1297,7 +1409,7 @@
       </div>
 
       <div class="storage-stats-sub">
-        <span id="storageBreakdownText">إجمالي المواد: 0 | إجمالي ملفات المواد: 0 | مرفقات الجدول: 0</span>
+        <span id="storageBreakdownText">إجمالي المواد: 0 | الفولدرات الفرعية: 0 | إجمالي ملفات المواد: 0 | مرفقات الجدول: 0</span>
         <span id="networkLiveState"><i class="fa-solid fa-wifi"></i> حالة الشبكة: متصل (مزامنة Firebase + Supabase مفعلة)</span>
       </div>
     </div>
@@ -1383,12 +1495,15 @@
         <div id="subjectsGridContainer" class="folders-grid"></div>
       </div>
 
-      <!-- عرض داخل المادة (الملفات والرفع المتعدد) -->
+      <!-- عرض داخل المادة (الفولدرات الفرعية + الملفات + الرفع المتعدد) -->
       <div id="insideSubjectView" style="display: none;">
+        <!-- شريط مسار التنقل (Breadcrumbs) لتسهيل التنقل بين الفولدرات الفرعية -->
+        <div class="breadcrumb-bar" id="folderBreadcrumbBar"></div>
+
         <div class="subject-inside-header">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <button class="btn" onclick="closeSubjectFolder()">
-              <i class="fa-solid fa-arrow-right"></i> رجوع للمواد
+            <button class="btn" onclick="handleBackStepButton()" id="insideBackBtn" title="الرجوع للصفحة السابقة">
+              <i class="fa-solid fa-arrow-right"></i> <span id="insideBackBtnText">رجوع للمواد</span>
             </button>
             <div>
               <h2 id="activeSubjectTitle" style="font-size: 1.2rem; font-weight: 900; color: var(--accent-primary);">اسم المادة</h2>
@@ -1397,6 +1512,9 @@
           </div>
 
           <div class="btn-group">
+            <button class="btn btn-warning" onclick="openSubfolderModal()">
+              <i class="fa-solid fa-folder-plus"></i> إضافة فولدر فرعي جديد
+            </button>
             <button class="btn btn-primary" onclick="document.getElementById('multiFileInput').click()">
               <i class="fa-solid fa-cloud-arrow-up"></i> رفع وتحديد كذا ملف
             </button>
@@ -1406,15 +1524,32 @@
           </div>
         </div>
 
+        <!-- قسم الفولدرات الفرعية داخل المادة / الفولدر الحالي -->
+        <div class="subfolders-section-box" id="subfoldersSectionBox">
+          <div class="subfolders-header-row">
+            <div class="subfolders-header-title">
+              <i class="fa-solid fa-folder-tree"></i>
+              <span id="subfoldersSectionTitle">الفولدرات الفرعية والتقسيمات داخل المادة:</span>
+            </div>
+            <button class="btn btn-sm btn-warning" onclick="openSubfolderModal()">
+              <i class="fa-solid fa-plus"></i> إنشاء فولدر فرعي هنا
+            </button>
+          </div>
+          <div id="subfoldersGridContainer" class="folders-grid"></div>
+        </div>
+
         <!-- منطقة السحب والإفلات ورفع عدة ملفات مع شريط التقدم الفعلي وقائمة الملفات -->
         <div class="upload-dropzone" id="subjectDropzone" onclick="document.getElementById('multiFileInput').click()">
           <input type="file" id="multiFileInput" multiple style="display: none;" onchange="handleSubjectFilesUpload(this.files)" />
           <i class="fa-solid fa-file-circle-plus main-up-icon"></i>
-          <h3>اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها داخل المادة</h3>
+          <h3 id="dropzoneHeadingText">اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها في هذا المكان</h3>
           <p>يدعم رفع (PDF، صور، ملفات نصية TXT، مذكرات Word/PPT، صوتيات، فيديوهات، وأي صيغة أخرى) — تعمل أوفلاين بدون نت وتُرفع كاملة 100% على Firebase و Supabase معاً</p>
           <div class="btn-group" style="justify-content: center;" onclick="event.stopPropagation();">
             <button class="btn btn-primary btn-sm" onclick="document.getElementById('multiFileInput').click()">
               <i class="fa-solid fa-plus"></i> اختيار عدة ملفات من الجهاز
+            </button>
+            <button class="btn btn-warning btn-sm" onclick="openSubfolderModal()">
+              <i class="fa-solid fa-folder-plus"></i> فولدر فرعي جديد
             </button>
             <button class="btn btn-sm" onclick="openTextNoteModal()">
               <i class="fa-solid fa-align-right"></i> إضافة نص / تلخيص سريع
@@ -1439,7 +1574,7 @@
         <div class="toolbar-card">
           <div class="search-wrapper">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="fileSearchInput" class="search-input" placeholder="ابحث باسم الملف داخل المادة..." oninput="renderSubjectFiles()" />
+            <input type="text" id="fileSearchInput" class="search-input" placeholder="ابحث باسم الملف أو الفولدر الفرعي..." oninput="renderSubjectFiles()" />
           </div>
 
           <div class="filter-pills">
@@ -1463,7 +1598,7 @@
           </div>
         </div>
 
-        <!-- شبكة الملفات داخل المادة -->
+        <!-- شبكة الملفات داخل المادة / الفولدر الفرعي -->
         <div id="subjectFilesGrid" class="files-grid"></div>
       </div>
     </section>
@@ -1580,6 +1715,31 @@
     </div>
   </div>
 
+  <!-- ==================== نافذة إضافة / تعديل فولدر فرعي داخل المادة ==================== -->
+  <div class="modal-overlay" id="subfolderModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="subfolderModalTitle">إضافة فولدر فرعي جديد</h3>
+        <button class="btn btn-sm" onclick="closeModal('subfolderModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editSubfolderId" />
+        <div class="form-group">
+          <label>اسم الفولدر الفرعي / التقسيم *</label>
+          <input type="text" id="subfolderNameInput" class="form-input" placeholder="مثال: المحاضرات / السكاشن / الشيتات / امتحانات سابقة..." />
+        </div>
+        <div class="form-group">
+          <label>وصف أو ملاحظات الفولدر الفرعي (اختياري)</label>
+          <input type="text" id="subfolderDescInput" class="form-input" placeholder="مثال: محاضرات د. محمد من الأسبوع 1 إلى 6" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('subfolderModal')">إلغاء</button>
+        <button class="btn btn-warning" onclick="saveSubfolder()"><i class="fa-solid fa-check"></i> حفظ الفولدر الفرعي</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== نافذة كتابة / تعديل مذكرة نصية داخل المادة ==================== -->
   <div class="modal-overlay" id="textNoteModal">
     <div class="modal-box">
@@ -1666,9 +1826,9 @@
     const SUPABASE_KEY = "sb_publishable_r6JmUcxJ_yamricI_EVI3g_lUXiAf0e";
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-    // ==================== 3. قاعدة بيانات الأوفلاين (IndexedDB) لحفظ الملفات كاملة بدون نقص ====================
+    // ==================== 3. قاعدة بيانات الأوفلاين (IndexedDB) لحفظ الملفات والفولدرات الفرعية كاملة ====================
     const IDB_NAME = "EngineeringStudyPortalOfflineDB_V2";
-    const IDB_VERSION = 2;
+    const IDB_VERSION = 3; // تمت الترقية لإضافة مخزن الفولدرات الفرعية مع الحفاظ التام على جميع البيانات السابقة
     let idbInstance = null;
 
     function openOfflineDB() {
@@ -1679,6 +1839,10 @@
           const db = e.target.result;
           if (!db.objectStoreNames.contains("subjects")) {
             db.createObjectStore("subjects", { keyPath: "id" });
+          }
+          if (!db.objectStoreNames.contains("subfolders")) {
+            const subStore = db.createObjectStore("subfolders", { keyPath: "id" });
+            subStore.createIndex("subjectId", "subjectId", { unique: false });
           }
           if (!db.objectStoreNames.contains("files")) {
             const fileStore = db.createObjectStore("files", { keyPath: "id" });
@@ -1742,8 +1906,10 @@
     // ==================== 4. الحالة العامة للتطبيق ====================
     const WEEK_DAYS = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
     let subjectsList = [];
+    let subfoldersList = [];
     let allFilesList = [];
     let activeSubjectId = null;
+    let activeSubfolderId = null; // null تعني أننا في الجذر الرئيسي للمادة، أو تحمل ID الفولدر الفرعي المفتوح حالياً
     let activeFileFilter = "all";
     let selectedFileIds = new Set();
     let scheduleDaysData = {
@@ -1757,6 +1923,81 @@
     };
     let isScheduleEditing = false;
     let currentViewerBlobUrl = null;
+    let isHandlingPopState = false;
+
+    // ==================== 4.1 إدارة زر الرجوع في المتصفح والهاتف (History API) لمنع إغلاق التطبيق ====================
+    function pushNavigationHistory(stateObj) {
+      if (isHandlingPopState) return;
+      try {
+        window.history.pushState(stateObj, "");
+      } catch (e) {}
+    }
+
+    function getAnyOpenModalId() {
+      const modals = ["fileViewerModal", "textNoteModal", "subfolderModal", "subjectModal"];
+      for (const mId of modals) {
+        const el = document.getElementById(mId);
+        if (el && el.classList.contains("open")) return mId;
+      }
+      return null;
+    }
+
+    window.addEventListener("popstate", (e) => {
+      isHandlingPopState = true;
+
+      // 1. إذا كانت هناك نافذة منبثقة مفتوحة (معاينة ملف أو إضافة فولدر/مذكرة) نغلقها فقط
+      const openModalId = getAnyOpenModalId();
+      if (openModalId) {
+        if (openModalId === "fileViewerModal") {
+          closeViewerModal(true);
+        } else {
+          closeModal(openModalId, true);
+        }
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 2. إذا كان المستخدم داخل فولدر فرعي جوا المادة، يرجع للفولدر الأب أو جذر المادة
+      if (activeSubjectId && activeSubfolderId) {
+        const currentSubfolder = subfoldersList.find(sf => sf.id === activeSubfolderId);
+        const parentFolderId = currentSubfolder ? (currentSubfolder.parentId || null) : null;
+        openSubfolder(parentFolderId, true);
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 3. إذا كان المستخدم داخل المادة نفسها، يرجع لقائمة المواد الرئيسية
+      if (activeSubjectId && !activeSubfolderId) {
+        closeSubjectFolder(true);
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 4. إذا كان المستخدم في تبويب الجدول الدراسي، يرجع لتبويب المواد الرئيسي
+      const schedSection = document.getElementById("sectionSchedule");
+      if (schedSection && schedSection.classList.contains("active")) {
+        switchMainTab("subjects", true);
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 5. إذا كان في الصفحة الرئيسية بالفعل، نعيد دفع حالة حماية حتى لا يخرج من البرنامج بالخطأ
+      try {
+        window.history.pushState({ page: "home_root" }, "");
+      } catch (err) {}
+      isHandlingPopState = false;
+    });
+
+    // دالة زر "رجوع" الموجود داخل المادة (يرجع خطوة للخلف: من الفولدر الفرعي للمادة، ومن المادة لقائمة المواد)
+    window.handleBackStepButton = function() {
+      if (activeSubjectId && activeSubfolderId) {
+        const currentSubfolder = subfoldersList.find(sf => sf.id === activeSubfolderId);
+        const parentFolderId = currentSubfolder ? (currentSubfolder.parentId || null) : null;
+        openSubfolder(parentFolderId);
+      } else {
+        closeSubjectFolder();
+      }
+    };
 
     // ==================== 5. تنبيهات Toast ====================
     window.showToast = function(msg) {
@@ -1869,14 +2110,13 @@
       const mbVal = (filesBytes / (1024 * 1024)).toFixed(2);
       document.getElementById("totalStorageText").textContent = `${mbVal} MB (${formatBytes(filesBytes)})`;
       document.getElementById("storageBreakdownText").textContent =
-        `إجمالي المواد: ${subjectsList.length} | إجمالي ملفات المواد: ${allFilesList.length} | مرفقات الجدول: ${schedAttachmentsCount}`;
+        `إجمالي المواد: ${subjectsList.length} | الفولدرات الفرعية: ${subfoldersList.length} | إجمالي ملفات المواد: ${allFilesList.length} | مرفقات الجدول: ${schedAttachmentsCount}`;
 
       const percent = Math.min(100, Math.max(filesBytes > 0 ? 4 : 0, (filesBytes / (500 * 1024 * 1024)) * 100));
       document.getElementById("storageProgressBar").style.width = `${percent}%`;
     }
 
     // ==================== 9. دوال قراءة وتحويل الملفات بدون أي فقد أو تلف للبايتات ====================
-    // قراءة الملف كـ ArrayBuffer كامل مع تتبع التقدم الفعلي للقراءة
     function readFileAsArrayBufferWithProgress(file, onProgress) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1891,10 +2131,9 @@
       });
     }
 
-    // تحويل ArrayBuffer إلى Base64 بشكل آمن وسريع بدون تجاوز الـ Call Stack
     function arrayBufferToBase64(buffer) {
       const bytes = new Uint8Array(buffer);
-      const chunkSize = 0x8000; // 32KB per slice
+      const chunkSize = 0x8000;
       const chunks = [];
       for (let i = 0; i < bytes.length; i += chunkSize) {
         chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)));
@@ -1902,7 +2141,6 @@
       return btoa(chunks.join(""));
     }
 
-    // تحويل Base64 إلى ArrayBuffer مطابق 100% للأصل
     function base64ToArrayBuffer(base64) {
       const binaryString = atob(base64);
       const len = binaryString.length;
@@ -1943,9 +2181,7 @@
       }
     }
 
-    // رفع ملف إلى Firebase مع تتبع النسبة المئوية الفعلية وتقسيم الحزم (Chunked Upload) لضمان عدم نقص حرف واحد
     async function uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, onProgressUpdate) {
-      // أولاً: محاولة الرفع المباشر على Firebase Storage مع مراقب التقدم الفعلي
       let storageSuccess = false;
       let fbDownloadUrl = null;
 
@@ -1958,7 +2194,6 @@
           let lastMovedTime = Date.now();
           let settled = false;
 
-          // إذا كان Storage معطلاً بسبب CORS ولا يتحرك لمدة 3.5 ثانية، ننتقل فوراً للرفع المقسم في قاعدة بيانات Firebase
           const stallTimer = setInterval(() => {
             if (!settled && Date.now() - lastMovedTime > 3500) {
               clearInterval(stallTimer);
@@ -1994,9 +2229,7 @@
         storageSuccess = false;
       }
 
-      // ثانياً: رفع حزم البيانات الكاملة (Chunked Upload) إلى Firebase Realtime Database
-      // يضمن هذا الجزء أن الملف بالكامل يُرفع جزءاً بجزء (256KB لكل جزء) ويتحرك شريط التقدم مع كل جزء فعلياً!
-      const CHUNK_SIZE = 260000; // ~256 KB per chunk
+      const CHUNK_SIZE = 260000;
       const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE) || 1;
 
       for (let c = 0; c < totalChunks; c++) {
@@ -2006,10 +2239,10 @@
         onProgressUpdate(chunkRatio);
       }
 
-      // حفظ البيانات الوصفية الكاملة للملف في Firebase
       const metaPayload = {
         id: fileRecord.id,
         subjectId: fileRecord.subjectId,
+        folderId: fileRecord.folderId || null,
         name: fileRecord.name,
         type: fileRecord.type,
         category: fileRecord.category,
@@ -2025,7 +2258,6 @@
       return { ok: true, fbDownloadUrl };
     }
 
-    // رفع الملف إلى Supabase باستخدام XMLHttpRequest للحصول على شريط التقدم الفعلي (xhr.upload.onprogress)
     async function uploadToSupabaseWithProgress(fileRecord, arrayBuffer, onProgressUpdate) {
       if (!supabaseClient) return { ok: false };
 
@@ -2033,7 +2265,6 @@
       const safePath = `${fileRecord.subjectId}/${fileRecord.id}_${encodeURIComponent(fileRecord.name)}`;
       const blob = new Blob([arrayBuffer], { type: fileRecord.type || "application/octet-stream" });
 
-      // محاولة الرفع المباشر عبر XHR لتتبع البايتات المرفوعة لحظياً
       for (const bucket of bucketCandidates) {
         try {
           const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${bucket}/${safePath}`;
@@ -2069,12 +2300,12 @@
         } catch (e) {}
       }
 
-      // في حال عدم وجود Bucket مفتوح بالاسم، نقوم بتحديث التقدم وتسجيل الملف في Supabase REST/Metadata
       onProgressUpdate(1);
       try {
         await supabaseClient.from("study_files").upsert({
           id: fileRecord.id,
           subject_id: fileRecord.subjectId,
+          folder_id: fileRecord.folderId || null,
           name: fileRecord.name,
           size: fileRecord.size,
           type: fileRecord.type,
@@ -2086,7 +2317,6 @@
       return { ok: true, sbDownloadUrl: null };
     }
 
-    // الدالة الشاملة لرفع ملف واحد بالكامل مع تحديث شريط التقدم اللحظي من 0% إلى 100%
     async function processAndUploadSingleFile(file, fileIndex, totalFiles, queueUI) {
       const cat = detectFileCategory(file);
       const exactSize = file.size;
@@ -2096,27 +2326,23 @@
         const uploadedBytesNow = Math.round((clampedPct / 100) * exactSize);
         const progressStatsStr = `${clampedPct}% (${formatBytes(uploadedBytesNow)} / ${formatBytes(exactSize)})`;
 
-        // تحديث الشريط الرئيسي
         document.getElementById("uploadProgressTitle").textContent =
           `(${fileIndex + 1} من ${totalFiles}) ${stageLabel}: ${file.name}`;
         document.getElementById("uploadProgressPercent").textContent = progressStatsStr;
         document.getElementById("uploadProgressBar").style.width = `${clampedPct}%`;
 
-        // تحديث عنصر الملف في قائمة الانتظار
         if (queueUI) {
           queueUI.barFill.style.width = `${clampedPct}%`;
           queueUI.statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--accent-primary);"></i> ${clampedPct}%`;
         }
       };
 
-      // المرحلة 1 (0% -> 20%): قراءة الملف بالكامل والتحقق من سلامة كل بايت
       updateLiveUI(2, "جاري قراءة وفحص الملف بالكامل");
       const arrayBuffer = await readFileAsArrayBufferWithProgress(file, (loaded, total) => {
         const readPct = (loaded / total) * 18;
         updateLiveUI(readPct, "جاري قراءة الملف");
       });
 
-      // التحقق الصارم من عدم نقصان أي بايت
       if (arrayBuffer.byteLength !== exactSize) {
         throw new Error(`حجم الملف المقروء غير مطابق للأصل (${arrayBuffer.byteLength} !== ${exactSize})`);
       }
@@ -2134,7 +2360,6 @@
 
       const fileId = "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
 
-      // حفظ البيانات الثنائية الكاملة (ArrayBuffer + Base64) في مخزن مستقل بـ IndexedDB لضمان السرعة وعدم التلف
       await idbPut("file_binaries", {
         id: fileId,
         arrayBuffer: arrayBuffer,
@@ -2146,13 +2371,13 @@
       const fileRecord = {
         id: fileId,
         subjectId: activeSubjectId,
+        folderId: activeSubfolderId || null,
         name: file.name,
         type: mimeType,
         category: cat,
         size: exactSize,
         exactByteLength: arrayBuffer.byteLength,
         createdAt: new Date().toISOString(),
-        // نحتفظ بمعاينة سريعة للصور فقط في الكائن العام لتسريع الواجهة
         previewDataUrl: cat === "image" ? dataUrl : null,
         textContent: textContent,
         offlineReady: true,
@@ -2167,12 +2392,10 @@
       await updateTotalStorageHeader();
       updateLiveUI(22, "تم الحفظ أوفلاين بالكامل، جاري الرفع السحابي");
 
-      // المرحلة 2 و 3 (22% -> 100%): الرفع السحابي المزدوج الفعلي مع تتبع التقدم
       const mode = document.getElementById("uploadEngineMode").value;
 
       if (mode !== "offline" && navigator.onLine) {
         if (mode === "dual") {
-          // رفع على Firebase (من 22% إلى 72%)
           try {
             const fbRes = await uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, (ratio) => {
               const currentPct = 22 + Math.round(ratio * 50);
@@ -2186,7 +2409,6 @@
             console.warn("Firebase upload fallback:", fbErr);
           }
 
-          // رفع على Supabase (من 72% إلى 99%)
           try {
             const sbRes = await uploadToSupabaseWithProgress(fileRecord, arrayBuffer, (ratio) => {
               const currentPct = 72 + Math.round(ratio * 27);
@@ -2211,18 +2433,15 @@
           if (sbRes.ok) fileRecord.supabaseSynced = true;
         }
       } else {
-        // في حالة الأوفلاين يتحرك الشريط بسلاسة حتى 100% لتأكيد اكتمال الحفظ المحلي
         updateLiveUI(65, "جاري التحقق من سلامة الملف أوفلاين");
         await new Promise(r => setTimeout(r, 180));
         fileRecord.firebaseSynced = true;
         fileRecord.supabaseSynced = true;
       }
 
-      // حفظ حالة المزامنة النهائية
       await idbPut("files", fileRecord);
       updateLiveUI(100, "اكتمل الرفع والحفظ بنجاح 100%");
 
-      // وضع علامة صح خضراء (✅) على الملف المكتمل في القائمة
       if (queueUI) {
         queueUI.itemEl.classList.remove("active");
         queueUI.itemEl.classList.add("done");
@@ -2233,7 +2452,6 @@
       renderSubjectFiles();
     }
 
-    // معالجة رفع ملف أو عدة ملفات بالتتابع (ملف يكتمل ويأخذ علامة صح ثم ينتقل للي بعده)
     window.handleSubjectFilesUpload = async function(fileList) {
       if (!activeSubjectId || !fileList || fileList.length === 0) return;
       const filesArray = Array.from(fileList);
@@ -2243,7 +2461,6 @@
       progBox.style.display = "block";
       queueListEl.innerHTML = "";
 
-      // إنشاء عناصر قائمة الانتظار لكل الملفات المختارة
       const queueUIs = filesArray.map((f, idx) => {
         const itemEl = document.createElement("div");
         itemEl.className = "queue-item";
@@ -2270,7 +2487,6 @@
         };
       });
 
-      // رفع الملفات واحداً تلو الآخر بدقة كاملة
       for (let i = 0; i < filesArray.length; i++) {
         const currentFile = filesArray[i];
         const qUI = queueUIs[i];
@@ -2298,7 +2514,6 @@
 
     // ==================== 11. استرجاع الملف الكامل (من الذاكرة أو تجميع الحزم السحابية) ====================
     async function getVerifiedFileArrayBuffer(fileRecord) {
-      // 1. البحث في مخزن البيانات الثنائية المحلي (IndexedDB)
       const localBin = await idbGet("file_binaries", fileRecord.id);
       if (localBin) {
         if (localBin.arrayBuffer && localBin.arrayBuffer.byteLength > 0) {
@@ -2309,7 +2524,6 @@
         }
       }
 
-      // 2. التوافق مع الملفات القديمة أو المرفوعة من جهاز آخر عبر تجميع الحزم من Firebase
       if (navigator.onLine && fileRecord.totalChunks) {
         showToast("جاري تحميل وتجميع أجزاء الملف الكامل من السحابة...");
         const chunksArr = [];
@@ -2333,7 +2547,6 @@
         }
       }
 
-      // 3. في حال كان ملفاً نصياً
       if (fileRecord.textContent !== undefined && fileRecord.textContent !== null) {
         return new TextEncoder().encode(fileRecord.textContent).buffer;
       }
@@ -2367,6 +2580,23 @@
           await dbSet(dbRef(fbDb, `study_portal_V2/subjects/${sub.id}`), sub).catch(() => {});
         }
 
+        // 1.1 مزامنة الفولدرات الفرعية داخل المواد
+        const fbSubfoldersSnap = await dbGet(dbRef(fbDb, "study_portal_V2/subfolders"));
+        if (fbSubfoldersSnap.exists()) {
+          const remoteSubfolders = fbSubfoldersSnap.val();
+          for (const sfKey in remoteSubfolders) {
+            const rSf = remoteSubfolders[sfKey];
+            if (!subfoldersList.some(sf => sf.id === rSf.id)) {
+              subfoldersList.push(rSf);
+              await idbPut("subfolders", rSf);
+            }
+          }
+        }
+
+        for (const sf of subfoldersList) {
+          await dbSet(dbRef(fbDb, `study_portal_V2/subfolders/${sf.id}`), sf).catch(() => {});
+        }
+
         // 2. جلب الملفات السحابية غير الموجودة محلياً
         const fbFilesSnap = await dbGet(dbRef(fbDb, "study_portal_V2/files"));
         if (fbFilesSnap.exists()) {
@@ -2376,6 +2606,7 @@
             if (!allFilesList.some(localF => localF.id === rf.id)) {
               const newLocalFile = {
                 ...rf,
+                folderId: rf.folderId || null,
                 offlineReady: true,
                 firebaseSynced: true,
                 supabaseSynced: true,
@@ -2414,7 +2645,7 @@
       }
     };
 
-    // ==================== 13. إدارة المواد (الفولدرات) ====================
+    // ==================== 13. إدارة المواد (الفولدرات الرئيسية) ====================
     window.openSubjectModal = function(editId = null) {
       const modal = document.getElementById("subjectModal");
       const titleEl = document.getElementById("subjectModalTitle");
@@ -2436,11 +2667,13 @@
         descInput.value = "";
       }
       modal.classList.add("open");
+      pushNavigationHistory({ modal: "subjectModal" });
       setTimeout(() => nameInput.focus(), 100);
     };
 
-    window.closeModal = function(modalId) {
-      document.getElementById(modalId).classList.remove("open");
+    window.closeModal = function(modalId, fromPopState = false) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.remove("open");
     };
 
     window.saveSubjectFolder = async function() {
@@ -2484,8 +2717,17 @@
       if (event) event.stopPropagation();
       const sub = subjectsList.find(s => s.id === subId);
       if (!sub) return;
-      if (!confirm(`هل أنت متأكد من حذف مادة "${sub.name}" وجميع الملفات الموجودة بداخلها؟`)) return;
+      if (!confirm(`هل أنت متأكد من حذف مادة "${sub.name}" وجميع الفولدرات الفرعية والملفات الموجودة بداخلها؟`)) return;
 
+      // حذف جميع الفولدرات الفرعية التابعة للمادة
+      const subFoldersToDelete = subfoldersList.filter(sf => sf.subjectId === subId);
+      for (const sf of subFoldersToDelete) {
+        await idbDelete("subfolders", sf.id);
+        dbRemove(dbRef(fbDb, `study_portal_V2/subfolders/${sf.id}`)).catch(() => {});
+      }
+      subfoldersList = subfoldersList.filter(sf => sf.subjectId !== subId);
+
+      // حذف جميع الملفات التابعة للمادة
       const subFiles = allFilesList.filter(f => f.subjectId === subId);
       for (const f of subFiles) {
         await idbDelete("files", f.id);
@@ -2501,7 +2743,7 @@
 
       renderSubjectsGrid();
       await updateTotalStorageHeader();
-      showToast("تم حذف فولدر المادة وملفاتها.");
+      showToast("تم حذف فولدر المادة وجميع محتوياتها.");
     };
 
     window.renderSubjectsGrid = function() {
@@ -2529,6 +2771,7 @@
 
       container.innerHTML = filtered.map(sub => {
         const subFiles = allFilesList.filter(f => f.subjectId === sub.id);
+        const subFoldersCount = subfoldersList.filter(sf => sf.subjectId === sub.id).length;
         const subBytes = subFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
         return `
           <div class="folder-card" onclick="openSubjectFolder('${sub.id}')">
@@ -2539,12 +2782,12 @@
                 </div>
                 <div>
                   <div class="folder-title">${escapeHtml(sub.name)}</div>
-                  <div class="folder-sub">${escapeHtml(sub.description || "اضغط للدخول ورفع وتصفح المحاضرات")}</div>
+                  <div class="folder-sub">${escapeHtml(sub.description || "اضغط للدخول وتقسيم الفولدرات والمحاضرات")}</div>
                 </div>
               </div>
             </div>
             <div class="folder-meta">
-              <span><i class="fa-regular fa-file-lines"></i> ${subFiles.length} ملفات (${formatBytes(subBytes)})</span>
+              <span><i class="fa-regular fa-folder-open"></i> ${subFoldersCount} فولدر فرعي • <i class="fa-regular fa-file-lines"></i> ${subFiles.length} ملف (${formatBytes(subBytes)})</span>
               <div class="folder-actions" onclick="event.stopPropagation();">
                 <button class="btn btn-sm" title="تعديل اسم المادة" onclick="openSubjectModal('${sub.id}')">
                   <i class="fa-solid fa-pen"></i>
@@ -2559,21 +2802,213 @@
       }).join("");
     };
 
-    // ==================== 14. الدخول داخل المادة وعرض الملفات ====================
-    window.openSubjectFolder = function(subId) {
+    // ==================== 13.1 إدارة الفولدرات الفرعية داخل المادة (Subfolders) ====================
+    window.openSubfolderModal = function(editId = null, event = null) {
+      if (event) event.stopPropagation();
+      if (!activeSubjectId) return;
+
+      const modal = document.getElementById("subfolderModal");
+      const titleEl = document.getElementById("subfolderModalTitle");
+      const idInput = document.getElementById("editSubfolderId");
+      const nameInput = document.getElementById("subfolderNameInput");
+      const descInput = document.getElementById("subfolderDescInput");
+
+      if (editId) {
+        const sf = subfoldersList.find(item => item.id === editId);
+        if (!sf) return;
+        titleEl.textContent = "تعديل الفولدر الفرعي";
+        idInput.value = sf.id;
+        nameInput.value = sf.name;
+        descInput.value = sf.description || "";
+      } else {
+        titleEl.textContent = "إضافة فولدر فرعي جديد داخل المكان الحالي";
+        idInput.value = "";
+        nameInput.value = "";
+        descInput.value = "";
+      }
+
+      modal.classList.add("open");
+      pushNavigationHistory({ modal: "subfolderModal" });
+      setTimeout(() => nameInput.focus(), 100);
+    };
+
+    window.saveSubfolder = async function() {
+      if (!activeSubjectId) return;
+      const editId = document.getElementById("editSubfolderId").value.trim();
+      const name = document.getElementById("subfolderNameInput").value.trim();
+      const description = document.getElementById("subfolderDescInput").value.trim();
+
+      if (!name) {
+        showToast("يرجى كتابة اسم الفولدر الفرعي أولاً!");
+        return;
+      }
+
+      if (editId) {
+        const idx = subfoldersList.findIndex(sf => sf.id === editId);
+        if (idx > -1) {
+          subfoldersList[idx].name = name;
+          subfoldersList[idx].description = description;
+          await idbPut("subfolders", subfoldersList[idx]);
+          dbSet(dbRef(fbDb, `study_portal_V2/subfolders/${editId}`), subfoldersList[idx]).catch(() => {});
+          showToast("تم تعديل الفولدر الفرعي بنجاح ✓");
+        }
+      } else {
+        const newSf = {
+          id: "sf_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+          subjectId: activeSubjectId,
+          parentId: activeSubfolderId || null,
+          name,
+          description,
+          createdAt: new Date().toISOString()
+        };
+        subfoldersList.push(newSf);
+        await idbPut("subfolders", newSf);
+        dbSet(dbRef(fbDb, `study_portal_V2/subfolders/${newSf.id}`), newSf).catch(() => {});
+        showToast(`تم إنشاء الفولدر الفرعي "${name}" بنجاح ✓`);
+      }
+
+      closeModal("subfolderModal");
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+    };
+
+    // جلب كافة الفولدرات الفرعية المتداخلة داخل فولدر معين لحساب الحجم أو الحذف
+    function getAllDescendantSubfolderIds(rootSubfolderId) {
+      const resultIds = [rootSubfolderId];
+      const findChildren = (parentId) => {
+        const children = subfoldersList.filter(sf => sf.parentId === parentId);
+        for (const ch of children) {
+          resultIds.push(ch.id);
+          findChildren(ch.id);
+        }
+      };
+      findChildren(rootSubfolderId);
+      return resultIds;
+    }
+
+    window.deleteSubfolder = async function(sfId, event) {
+      if (event) event.stopPropagation();
+      const sf = subfoldersList.find(item => item.id === sfId);
+      if (!sf) return;
+      if (!confirm(`هل أنت متأكد من حذف الفولدر الفرعي "${sf.name}" وجميع الملفات والفولدرات الموجودة بداخله؟`)) return;
+
+      const allTargetFolderIds = new Set(getAllDescendantSubfolderIds(sfId));
+
+      // حذف جميع الملفات داخل هذا الفولدر الفرعي وفولدراته الداخلية
+      const filesToDelete = allFilesList.filter(f => f.subjectId === activeSubjectId && allTargetFolderIds.has(f.folderId));
+      for (const f of filesToDelete) {
+        await idbDelete("files", f.id);
+        await idbDelete("file_binaries", f.id);
+        dbRemove(dbRef(fbDb, `study_portal_V2/files/${f.id}`)).catch(() => {});
+        dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${f.id}`)).catch(() => {});
+      }
+      allFilesList = allFilesList.filter(f => !(f.subjectId === activeSubjectId && allTargetFolderIds.has(f.folderId)));
+
+      // حذف الفولدر الفرعي وأي فولدرات فرعية بداخله
+      for (const targetId of allTargetFolderIds) {
+        await idbDelete("subfolders", targetId);
+        dbRemove(dbRef(fbDb, `study_portal_V2/subfolders/${targetId}`)).catch(() => {});
+      }
+      subfoldersList = subfoldersList.filter(item => !allTargetFolderIds.has(item.id));
+
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حذف الفولدر الفرعي ومحتوياته.");
+    };
+
+    window.openSubfolder = function(subfolderId, fromPopState = false) {
+      activeSubfolderId = subfolderId || null;
+      selectedFileIds.clear();
+      document.getElementById("uploadProgressBox").style.display = "none";
+
+      if (!fromPopState) {
+        pushNavigationHistory({ view: "subfolder", subjectId: activeSubjectId, subfolderId: activeSubfolderId });
+      }
+
+      renderSubjectFiles();
+    };
+
+    function buildSubfolderBreadcrumbChain(currentSfId) {
+      const chain = [];
+      let currId = currentSfId;
+      let safety = 0;
+      while (currId && safety < 30) {
+        const found = subfoldersList.find(sf => sf.id === currId);
+        if (!found) break;
+        chain.unshift(found);
+        currId = found.parentId || null;
+        safety++;
+      }
+      return chain;
+    }
+
+    function renderBreadcrumbsAndHeaders() {
+      const sub = subjectsList.find(s => s.id === activeSubjectId);
+      if (!sub) return;
+
+      const breadcrumbBar = document.getElementById("folderBreadcrumbBar");
+      const backBtnText = document.getElementById("insideBackBtnText");
+      const activeTitleEl = document.getElementById("activeSubjectTitle");
+      const dropzoneHeading = document.getElementById("dropzoneHeadingText");
+
+      const chain = buildSubfolderBreadcrumbChain(activeSubfolderId);
+
+      let html = `
+        <span class="breadcrumb-item" onclick="closeSubjectFolder()">
+          <i class="fa-solid fa-house"></i> كل المواد
+        </span>
+        <i class="fa-solid fa-chevron-left breadcrumb-sep"></i>
+        <span class="breadcrumb-item ${chain.length === 0 ? 'current' : ''}" onclick="openSubfolder(null)">
+          <i class="fa-solid fa-folder-open"></i> ${escapeHtml(sub.name)}
+        </span>
+      `;
+
+      chain.forEach((sf, idx) => {
+        const isLast = idx === chain.length - 1;
+        html += `
+          <i class="fa-solid fa-chevron-left breadcrumb-sep"></i>
+          <span class="breadcrumb-item ${isLast ? 'current' : ''}" onclick="openSubfolder('${sf.id}')">
+            <i class="fa-solid fa-folder"></i> ${escapeHtml(sf.name)}
+          </span>
+        `;
+      });
+
+      breadcrumbBar.innerHTML = html;
+
+      if (chain.length > 0) {
+        const currentSf = chain[chain.length - 1];
+        const parentName = chain.length > 1 ? chain[chain.length - 2].name : sub.name;
+        backBtnText.textContent = `رجوع إلى (${parentName})`;
+        activeTitleEl.innerHTML = `<i class="fa-solid fa-folder-open" style="color: var(--warning);"></i> ${escapeHtml(sub.name)} / ${escapeHtml(currentSf.name)}`;
+        dropzoneHeading.textContent = `اضغط هنا أو اسحب لرفع ملفات داخل فولدر (${currentSf.name})`;
+      } else {
+        backBtnText.textContent = "رجوع للمواد";
+        activeTitleEl.textContent = sub.name;
+        dropzoneHeading.textContent = `اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها داخل المادة`;
+      }
+    }
+
+    // ==================== 14. الدخول داخل المادة وعرض الفولدرات الفرعية والملفات ====================
+    window.openSubjectFolder = function(subId, fromPopState = false) {
       const sub = subjectsList.find(s => s.id === subId);
       if (!sub) return;
       activeSubjectId = subId;
+      activeSubfolderId = null;
       selectedFileIds.clear();
       document.getElementById("foldersListView").style.display = "none";
       document.getElementById("insideSubjectView").style.display = "block";
       document.getElementById("uploadProgressBox").style.display = "none";
-      document.getElementById("activeSubjectTitle").textContent = sub.name;
+
+      if (!fromPopState) {
+        pushNavigationHistory({ view: "subject", subjectId: subId });
+      }
+
       renderSubjectFiles();
     };
 
-    window.closeSubjectFolder = function() {
+    window.closeSubjectFolder = function(fromPopState = false) {
       activeSubjectId = null;
+      activeSubfolderId = null;
       selectedFileIds.clear();
       document.getElementById("insideSubjectView").style.display = "none";
       document.getElementById("foldersListView").style.display = "block";
@@ -2605,7 +3040,7 @@
       }
     });
 
-    // كتابة مذكرة نصية مباشرة داخل المادة
+    // كتابة مذكرة نصية مباشرة داخل المادة أو الفولدر الفرعي
     window.openTextNoteModal = function(editFileId = null) {
       if (!activeSubjectId) return;
       const modal = document.getElementById("textNoteModal");
@@ -2621,12 +3056,13 @@
         titleInp.value = existing.name;
         contentInp.value = existing.textContent || "";
       } else {
-        document.getElementById("textNoteModalTitle").textContent = "كتابة مذكرة نصية جديدة داخل المادة";
+        document.getElementById("textNoteModalTitle").textContent = "كتابة مذكرة نصية جديدة";
         idInp.value = "";
         titleInp.value = "";
         contentInp.value = "";
       }
       modal.classList.add("open");
+      pushNavigationHistory({ modal: "textNoteModal" });
     };
 
     window.saveCustomTextNote = async function() {
@@ -2687,15 +3123,79 @@
 
     window.renderSubjectFiles = function() {
       if (!activeSubjectId) return;
+
+      renderBreadcrumbsAndHeaders();
+
       const grid = document.getElementById("subjectFilesGrid");
+      const subfoldersGrid = document.getElementById("subfoldersGridContainer");
       const query = (document.getElementById("fileSearchInput").value || "").trim().toLowerCase();
 
-      const subFiles = allFilesList.filter(f => f.subjectId === activeSubjectId);
-      const totalSubBytes = subFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
-      document.getElementById("activeSubjectMeta").textContent =
-        `إجمالي الملفات بالمادة: ${subFiles.length} ملف | المساحة: ${formatBytes(totalSubBytes)}`;
+      // 1. عرض الفولدرات الفرعية الموجودة في المستوى الحالي
+      const currentLevelSubfolders = subfoldersList.filter(sf =>
+        sf.subjectId === activeSubjectId &&
+        (sf.parentId || null) === (activeSubfolderId || null) &&
+        (sf.name.toLowerCase().includes(query) || (sf.description && sf.description.toLowerCase().includes(query)))
+      );
 
-      const filtered = subFiles.filter(f => {
+      if (currentLevelSubfolders.length === 0) {
+        subfoldersGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 12px; color: var(--text-muted); font-size: 0.85rem; border: 1px dashed var(--border-dashed); border-radius: 10px;">
+            لا توجد فولدرات فرعية في هذا المستوى حالياً — يمكنك الضغط على <strong>"إنشاء فولدر فرعي هنا"</strong> لتقسيم وتنظيم المحاضرات والسكاشن والشيتات.
+          </div>
+        `;
+      } else {
+        subfoldersGrid.innerHTML = currentLevelSubfolders.map(sf => {
+          const treeIds = new Set(getAllDescendantSubfolderIds(sf.id));
+          const sfFiles = allFilesList.filter(f => f.subjectId === activeSubjectId && treeIds.has(f.folderId));
+          const childSubfoldersCount = subfoldersList.filter(item => item.parentId === sf.id).length;
+          const sfBytes = sfFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+
+          return `
+            <div class="folder-card subfolder-variant" onclick="openSubfolder('${sf.id}')">
+              <div class="folder-top">
+                <div class="folder-icon-wrap">
+                  <div class="folder-icon sub-icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                  </div>
+                  <div>
+                    <div class="folder-title">${escapeHtml(sf.name)}</div>
+                    <div class="folder-sub">${escapeHtml(sf.description || "فولدر فرعي — اضغط للفتح")}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="folder-meta">
+                <span>
+                  ${childSubfoldersCount > 0 ? `<i class="fa-regular fa-folder"></i> ${childSubfoldersCount} فرعي • ` : ""}
+                  <i class="fa-regular fa-file-lines"></i> ${sfFiles.length} ملف (${formatBytes(sfBytes)})
+                </span>
+                <div class="folder-actions" onclick="event.stopPropagation();">
+                  <button class="btn btn-sm" title="تعديل اسم الفولدر الفرعي" onclick="openSubfolderModal('${sf.id}', event)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" title="حذف الفولدر الفرعي" onclick="deleteSubfolder('${sf.id}', event)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // 2. عرض الملفات الموجودة في المستوى الحالي (جذر المادة أو داخل الفولدر الفرعي المفتوح)
+      const currentLevelFiles = allFilesList.filter(f =>
+        f.subjectId === activeSubjectId &&
+        (f.folderId || null) === (activeSubfolderId || null)
+      );
+
+      const allSubjectFiles = allFilesList.filter(f => f.subjectId === activeSubjectId);
+      const totalSubBytes = allSubjectFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+      const currentLevelBytes = currentLevelFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+
+      document.getElementById("activeSubjectMeta").textContent =
+        `الملفات في هذا المكان: ${currentLevelFiles.length} ملف (${formatBytes(currentLevelBytes)}) | إجمالي المادة بالكامل: ${allSubjectFiles.length} ملف (${formatBytes(totalSubBytes)})`;
+
+      const filtered = currentLevelFiles.filter(f => {
         const matchFilter = activeFileFilter === "all" || f.category === activeFileFilter;
         const matchQuery = f.name.toLowerCase().includes(query) || (f.textContent && f.textContent.toLowerCase().includes(query));
         return matchFilter && matchQuery;
@@ -2707,8 +3207,8 @@
         grid.innerHTML = `
           <div class="empty-state-box" style="grid-column: 1 / -1;">
             <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 10px;"></i>
-            <h3 style="color: var(--text-main); margin-bottom: 6px;">لا توجد ملفات في هذا القسم حالياً</h3>
-            <p style="font-size: 0.86rem;">ارفع ملفات PDF أو صور أو مذكرات نصية أو أي ملفات تريدها بالأعلى وستعمل معك أوفلاين في أي وقت.</p>
+            <h3 style="color: var(--text-main); margin-bottom: 6px;">لا توجد ملفات مرفوعة في هذا المكان حالياً</h3>
+            <p style="font-size: 0.86rem;">ارفع ملفات PDF أو صور أو مذكرات نصية بالأعلى، أو ادخل على أحد الفولدرات الفرعية لتصفح ملفاته.</p>
           </div>
         `;
         return;
@@ -2789,11 +3289,14 @@
     };
 
     window.toggleSelectAllFiles = function() {
-      const subFiles = allFilesList.filter(f => f.subjectId === activeSubjectId);
-      if (selectedFileIds.size === subFiles.length && subFiles.length > 0) {
+      const currentLevelFiles = allFilesList.filter(f =>
+        f.subjectId === activeSubjectId &&
+        (f.folderId || null) === (activeSubfolderId || null)
+      );
+      if (selectedFileIds.size === currentLevelFiles.length && currentLevelFiles.length > 0) {
         selectedFileIds.clear();
       } else {
-        subFiles.forEach(f => selectedFileIds.add(f.id));
+        currentLevelFiles.forEach(f => selectedFileIds.add(f.id));
       }
       renderSubjectFiles();
     };
@@ -2872,7 +3375,6 @@
       }
     };
 
-    // دالة عرض صفحات الـ PDF بالكامل داخل النافذة باستخدام PDF.js لضمان عملها 100% على الأندرويد والآيفون والكمبيوتر
     async function renderFullPdfInsideElement(arrayBuffer, containerEl, blobUrl) {
       if (!window.pdfjsLib) {
         containerEl.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:75vh; border:none; border-radius:8px; background:#fff;"></iframe>`;
@@ -2888,7 +3390,6 @@
       `;
 
       try {
-        // نأخذ نسخة من الـ ArrayBuffer حتى لا يتم استهلاكه (Detached) بواسطة العامل
         const bufferCopy = arrayBuffer.slice(0);
         const loadingTask = window.pdfjsLib.getDocument({ data: bufferCopy });
         const pdfDoc = await loadingTask.promise;
@@ -2898,7 +3399,9 @@
         const holder = document.getElementById("pdfPagesHolder");
 
         for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-          document.getElementById("pdfStatusBanner").innerHTML = `
+          const bannerEl = document.getElementById("pdfStatusBanner");
+          if (!bannerEl) break;
+          bannerEl.innerHTML = `
             <span><i class="fa-solid fa-book-open" style="color: var(--accent-primary);"></i> جاري تجهيز صفحة (${pageNum} من ${totalPages})...</span>
             <span style="font-weight:800; color: var(--img-neon);">إجمالي الصفحات: ${totalPages}</span>
           `;
@@ -2929,10 +3432,13 @@
           await page.render({ canvasContext: ctx, viewport: viewport }).promise;
         }
 
-        document.getElementById("pdfStatusBanner").innerHTML = `
-          <span><i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم عرض الملف بالكامل (${totalPages} من ${totalPages} صفحات) ✓</span>
-          <span style="font-weight:800; color: var(--img-neon);">كامل 100%</span>
-        `;
+        const finalBanner = document.getElementById("pdfStatusBanner");
+        if (finalBanner) {
+          finalBanner.innerHTML = `
+            <span><i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم عرض الملف بالكامل (${totalPages} من ${totalPages} صفحات) ✓</span>
+            <span style="font-weight:800; color: var(--img-neon);">كامل 100%</span>
+          `;
+        }
       } catch (err) {
         console.warn("PDF.js fallback to native iframe:", err);
         containerEl.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:75vh; border:none; border-radius:8px; background:#fff;"></iframe>`;
@@ -2958,6 +3464,7 @@
       dlBtn.onclick = () => downloadFileToDevice(f.id);
       bodyEl.innerHTML = `<div style="padding: 40px; text-align: center;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><p style="margin-top: 10px;">جاري فتح الملف الكامل...</p></div>`;
       modal.classList.add("open");
+      pushNavigationHistory({ modal: "fileViewerModal", fileId: f.id });
 
       const arrayBuffer = await getVerifiedFileArrayBuffer(f);
       if (!arrayBuffer) {
@@ -2996,7 +3503,7 @@
       }
     };
 
-    window.closeViewerModal = function() {
+    window.closeViewerModal = function(fromPopState = false) {
       document.getElementById("fileViewerModal").classList.remove("open");
       document.getElementById("viewerModalBody").innerHTML = "";
     };
@@ -3064,7 +3571,6 @@
       dbSet(dbRef(fbDb, "study_portal_V2/schedule_days"), scheduleDaysData).catch(() => {});
     }
 
-    // رفع وعرض ملف الجدول (PDF) بشريط تقدم فعلي
     window.handleSchedulePdfUpload = async function(fileList) {
       if (!fileList || fileList.length === 0) return;
       const f = fileList[0];
@@ -3136,6 +3642,7 @@
 
       const bodyEl = document.getElementById("viewerModalBody");
       document.getElementById("fileViewerModal").classList.add("open");
+      pushNavigationHistory({ modal: "fileViewerModal", type: "schedule_pdf" });
       await renderFullPdfInsideElement(arrayBuffer, bodyEl, url);
     };
 
@@ -3164,7 +3671,6 @@
       showToast("تم حذف ملف PDF للجدول.");
     };
 
-    // رفع وعرض صور الجدول بشريط تقدم فعلي
     window.handleScheduleImagesUpload = async function(fileList) {
       if (!fileList || fileList.length === 0) return;
       const filesArr = Array.from(fileList);
@@ -3222,6 +3728,7 @@
         <img src="${item.dataUrl}" style="max-width: 100%; max-height: 76vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(item.name)}" />
       `;
       document.getElementById("fileViewerModal").classList.add("open");
+      pushNavigationHistory({ modal: "fileViewerModal", type: "schedule_img", imgId });
     };
 
     window.downloadScheduleImage = async function(imgId) {
@@ -3310,17 +3817,22 @@
     }
 
     // ==================== 18. التبديل بين الأقسام وتصدير النسخة الاحتياطية ====================
-    window.switchMainTab = function(tabName) {
+    window.switchMainTab = function(tabName, fromPopState = false) {
       document.getElementById("tabBtnSubjects").classList.toggle("active", tabName === "subjects");
       document.getElementById("tabBtnSchedule").classList.toggle("active", tabName === "schedule");
       document.getElementById("sectionSubjects").classList.toggle("active", tabName === "subjects");
       document.getElementById("sectionSchedule").classList.toggle("active", tabName === "schedule");
+
+      if (!fromPopState && tabName === "schedule") {
+        pushNavigationHistory({ tab: "schedule" });
+      }
     };
 
     window.exportFullBackup = async function() {
       const backupObj = {
         exportedAt: new Date().toISOString(),
         subjects: subjectsList,
+        subfolders: subfoldersList,
         scheduleDays: scheduleDaysData,
         filesCount: allFilesList.length
       };
@@ -3358,10 +3870,17 @@
 
     // ==================== 19. بدء تشغيل الموقع وتحميل البيانات ====================
     async function initStudyPortal() {
+      // تهيئة حالة التاريخ (History State) الأساسية لحماية زر الرجوع من إغلاق التطبيق
+      try {
+        window.history.replaceState({ page: "home_root" }, "");
+        window.history.pushState({ page: "home_guard" }, "");
+      } catch (e) {}
+
       updateNetworkBadge();
       await openOfflineDB();
 
       subjectsList = await idbGetAll("subjects");
+      subfoldersList = await idbGetAll("subfolders");
       allFilesList = await idbGetAll("files");
       allFilesList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
